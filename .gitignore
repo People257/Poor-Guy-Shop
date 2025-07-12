@@ -1,0 +1,27 @@
+# IDEA
+**/.idea/
+
+go.work
+go.work.sum
+
+.cursor
+.claude
+
+.DS_Store
+
+**/bin/**
+**/docker-compose.*.yml
+**/Dockerfile.*
+!Dockerfile.gomod.yml
+
+**/keystore/**
+
+**/.vscode/**
+.cnb/pre-install/nginx
+.cnb/pre-install/templates
+build-docker.sh
+*-*/fix-credentials.sh
+.cnb/pre-install/consul/logs
+.github/
+tutorial-service/
+
