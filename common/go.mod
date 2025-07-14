@@ -3,6 +3,7 @@ module github.com/people257/poor-guy-shop/common
 go 1.24.4
 
 require (
+	github.com/google/wire v0.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/hashicorp/consul/api v1.32.1
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -10,6 +11,8 @@ require (
 	github.com/knadh/koanf/v2 v2.2.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	go.uber.org/zap v1.27.0
+	golang.org/x/sync v0.12.0
+	google.golang.org/grpc v1.67.1
 )
 
 require (
@@ -40,7 +43,6 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240826202546-f6391c0de4c7 // indirect
-	google.golang.org/grpc v1.67.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

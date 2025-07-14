@@ -19,7 +19,7 @@ type Sever struct {
 	Register   *internal.Register
 }
 
-func newSever(
+func newServer(
 	cfg *config.GrpcServerConfig,
 	s *grpc.Server,
 	register *internal.Register,
@@ -68,4 +68,8 @@ func (s *Sever) Run(ctx context.Context) error {
 
 	zap.L().Info("Sever is running")
 	return errGroup.Wait()
+}
+
+func (s *Sever) RegisterServer(fn func(s *grpc.Server)) {
+	fn(s.GrpcServer)
 }
