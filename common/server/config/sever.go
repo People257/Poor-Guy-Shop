@@ -9,14 +9,16 @@ const (
 )
 
 type ServerConfig struct {
-	Name string `mapstructure:"name"`
-	Env  string `mapstructure:"env"`
-	Port uint16 `mapstructure:"port"`
+	Name    string `mapstructure:"name"`
+	Env     string `mapstructure:"env"`
+	Port    uint16 `mapstructure:"port"`
+	Address string `mapstructure:"address"`
 }
 
 type GrpcServerConfig struct {
-	Server ServerConfig `mapstructure:"server"`
-	Log    LogConfig    `mapstructure:"log"`
+	Server   ServerConfig   `mapstructure:"server"`
+	Log      LogConfig      `mapstructure:"log"`
+	Registry RegistryConfig `mapstructure:"registry"`
 }
 
 func ValidateEnv(env string) error {
@@ -26,7 +28,7 @@ func ValidateEnv(env string) error {
 	return nil
 }
 
-func GetServerConfig(config *Config) *ServerConfig {
+func GetServerConfig(config *GrpcServerConfig) *ServerConfig {
 	if config == nil {
 		return nil
 	}
