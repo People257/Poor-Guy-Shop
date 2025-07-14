@@ -1,10 +1,12 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"github.com/people257/poor-guy-shop/common/server/config"
 	"github.com/people257/poor-guy-shop/common/server/internal"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -43,4 +45,27 @@ func (s *Sever) startGrpcSever() error {
 	}
 
 	return nil
+}
+
+func (s *Sever) Run(ctx context.Context) error {
+	errGroup, ctx := errgroup.WithContext(ctx)
+
+	// 启动grpc 服务
+	errGroup.Go(func() error {
+		return s.startGrpcSever()
+	})
+
+	// 启动服务注册与心跳 goroutine
+	errGroup.Go(func() error {
+		if err := s.Register.RegisterService(); err != nil {
+			return fmt.Errorf("failed to register service: %v", err)
+		}
+
+		// 上下文取消时,注销服务
+		<-ctx.Done()
+		return s.Register.DeregisterService()
+	})
+
+	zap.L().Info("Sever is running")
+	return errGroup.Wait()
 }
