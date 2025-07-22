@@ -3,45 +3,67 @@ package internal
 import (
 	"context"
 	"fmt"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/natefinch/lumberjack"
 	"github.com/people257/poor-guy-shop/common/server/config"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"go.opentelemetry.io/contrib/bridges/otelzap"
+	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
+	"go.opentelemetry.io/otel/log"
+	"go.opentelemetry.io/otel/log/noop"
+	sdklog "go.opentelemetry.io/otel/sdk/log"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.32.0"
 	"os"
 	"path/filepath"
+
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func NewZapLogger(
-	serverCfg *config.ServerConfig,
+// NewZapLogger 创建新的 Zap 日志记录器
+func NewZapLogger(cfg *config.ServerConfig,
 	logCfg *config.LogConfig,
+	observabilityCfg *config.ObservabilityConfig,
+	loggerProvider log.LoggerProvider,
 ) (*zap.Logger, func()) {
-	// 创建 zap 日志器
-	encoderConfig := createEncoderConfig(serverCfg.Env)
+	// 根据环境创建编码器配置
+	encoderConfig := createEncoderConfig(cfg.Env)
 
+	// 创建日志核心数组,用于支持多输出
 	var cores []zapcore.Core
 
-	if logCfg.Console.Enable {
-		cores = append(cores, createConsoleCore(logCfg, encoderConfig))
-	}
-
+	// 如果启用了文件日志,添加文件输出核心
 	if logCfg.File.Enable {
 		cores = append(cores, createFileCore(logCfg, encoderConfig))
 	}
 
+	// 如果启用了控制台日志,添加控制台输出核心
+	if logCfg.Console.Enable {
+		cores = append(cores, createConsoleCore(logCfg, encoderConfig))
+	}
+
+	// 如果启用可观测性,添加可观测性输出核心
+	if observabilityCfg.Log.Enable {
+		cores = append(cores, otelzap.NewCore(cfg.Name, otelzap.WithLoggerProvider(loggerProvider)))
+	}
+
+	// 使用 Tee 创建多核心日志记录器
 	core := zapcore.NewTee(cores...)
 
+	// 创建日志记录器并配置选项
 	logger := zap.New(
 		core,
-		zap.AddCaller(),
-		zap.AddStacktrace(zapcore.ErrorLevel),
+		zap.AddCaller(),                       // 添加调用者信息
+		zap.AddStacktrace(zapcore.ErrorLevel), // Error 级别及以上添加堆栈跟踪
 	)
 
+	// 替换全局日志记录器
 	zap.ReplaceGlobals(logger)
 
 	return logger, createCleanupFunc(logger)
 }
 
+// createEncoderConfig 创建日志编码器配置
 func createEncoderConfig(env string) zapcore.EncoderConfig {
 	cfg := zapcore.EncoderConfig{
 		TimeKey:        "timestamp",
@@ -51,48 +73,55 @@ func createEncoderConfig(env string) zapcore.EncoderConfig {
 		MessageKey:     "message",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder, // 默认使用小写级别
-		EncodeTime:     zapcore.ISO8601TimeEncoder,    // ISO8601 格式的时间
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder, // 只显示文件名和行号
+		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	if env != config.EnvProd {
-		cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	// 生产环境使用小写日志级别,其他环境使用彩色大写日志级别
+	if env == config.EnvProd {
+		cfg.EncodeLevel = zapcore.LowercaseLevelEncoder
+	} else {
+		cfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
 
 	return cfg
 }
 
+// createFileCore 创建文件输出核心
+// 配置日志文件的路径、轮转策略等
 func createFileCore(cfg *config.LogConfig, encConfig zapcore.EncoderConfig) zapcore.Core {
+	// 确保日志目录存在
 	logDir := cfg.File.Directory
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		panic(fmt.Sprintf("failed to create log directory: %v", err))
 	}
 
+	// 配置日志轮转
 	rotator := &lumberjack.Logger{
 		Filename:   filepath.Join(logDir, cfg.File.Name), // 日志文件路径
-		MaxSize:    int(cfg.File.MaxSize),                // 单个文件最大尺寸 (MB)
-		MaxAge:     int(cfg.File.MaxAge),                 // 文件最长保留天数
-		MaxBackups: int(cfg.File.MaxBackups),             // 最多保留的旧文件数量
-		Compress:   cfg.File.Compress,                    // 是否压缩旧文件
-		LocalTime:  cfg.File.LocalTime,                   // 是否使用本地时间
+		MaxSize:    cfg.File.MaxSize,                     // 单个文件最大尺寸(MB)
+		MaxAge:     cfg.File.MaxAge,                      // 保留天数
+		MaxBackups: cfg.File.MaxBackups,                  // 保留的旧文件数量
+		Compress:   cfg.File.Compress,                    // 是否压缩
+		LocalTime:  cfg.File.LocalTime,                   // 使用本地时间
 	}
 
-	// 解析配置中的日志级别字符串，例如 "info", "debug", "error"。
-	logLevel, err := zapcore.ParseLevel(cfg.Level)
+	lvl, err := zapcore.ParseLevel(cfg.Level)
 	if err != nil {
-		// 如果配置的级别无效，默认使用 info 级别。
-		logLevel = zapcore.InfoLevel
+		panic(err)
 	}
 
 	return zapcore.NewCore(
-		zapcore.NewJSONEncoder(encConfig), // 文件日志总是使用 JSON 格式，方便机器解析。
-		zapcore.AddSync(rotator),          // 将 lumberjack rotator 作为写入目标。
-		logLevel,                          // 设置这个 Core 处理的最低日志级别。
+		zapcore.NewJSONEncoder(encConfig), // JSON 格式编码器
+		zapcore.AddSync(rotator),          // 添加同步写入器
+		lvl,                               // 设置日志级别
 	)
 }
 
+// createConsoleCore 创建控制台输出核心
+// 支持 JSON 或普通文本格式
 func createConsoleCore(cfg *config.LogConfig, encConfig zapcore.EncoderConfig) zapcore.Core {
 	var encoder zapcore.Encoder
 	if cfg.Console.Format == "json" {
@@ -101,35 +130,92 @@ func createConsoleCore(cfg *config.LogConfig, encConfig zapcore.EncoderConfig) z
 		encoder = zapcore.NewConsoleEncoder(encConfig)
 	}
 
-	logLevel, err := zapcore.ParseLevel(cfg.Level)
+	lvl, err := zapcore.ParseLevel(cfg.Level)
 	if err != nil {
-		// 如果配置的级别无效，默认使用 info 级别。
-		logLevel = zapcore.InfoLevel
+		panic(err)
 	}
-
 	return zapcore.NewCore(
 		encoder,
-		zapcore.AddSync(os.Stdout),
-		logLevel,
+		zapcore.AddSync(os.Stdout), // 标准输出
+		lvl,                        // 设置日志级别
 	)
-
 }
 
-// createCleanupFunc 创建日志清理函数，在日志关闭时执行，保证日志文件写入完成
+// createCleanupFunc 创建日志清理函数
+// 在服务关闭时同步缓存的日志
 func createCleanupFunc(logger *zap.Logger) func() {
 	return func() {
 		_ = logger.Sync()
 	}
 }
 
+func NewLoggerProvider(
+	exporter sdklog.Exporter,
+	serverCfg *config.ServerConfig,
+	cfg *config.ObservabilityConfig,
+
+) (log.LoggerProvider, func()) {
+	cleanUp := func() {}
+
+	if cfg.Log.Enable {
+		res := resource.NewSchemaless(
+			semconv.ServiceName(serverCfg.Name),
+			semconv.DeploymentEnvironmentName(serverCfg.Env),
+		)
+
+		p := sdklog.NewLoggerProvider(
+			sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
+			sdklog.WithResource(res),
+		)
+		cleanUp = func() {
+			ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
+			defer cancel()
+			if err := p.Shutdown(ctx); err != nil {
+				zap.L().Error("failed to shutdown trace provider", zap.Error(err))
+			}
+		}
+		return p, cleanUp
+	} else {
+		return noop.NewLoggerProvider(), cleanUp
+	}
+}
+
+func NewLogExporter(ctx context.Context, cfg *config.ObservabilityConfig) (sdklog.Exporter, func()) {
+	if !cfg.Log.Enable {
+		return nil, func() {}
+	}
+	exporter, err := otlploggrpc.New(ctx,
+		otlploggrpc.WithEndpoint(cfg.Address),
+		otlploggrpc.WithInsecure(),
+		otlploggrpc.WithCompressor("gzip"),
+		otlploggrpc.WithHeaders(cfg.OTLPHeaders),
+	)
+	if err != nil {
+		panic(err)
+	}
+	cleanUp := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
+		defer cancel()
+		if err := exporter.Shutdown(ctx); err != nil {
+			zap.L().Error("failed to shutdown log exporter", zap.Error(err))
+		}
+	}
+	return exporter, cleanUp
+}
+
+// InterceptorLogger 创建用于 gRPC 拦截器的日志适配器
+// 将 gRPC 日志转换为 Zap 日志格式
 func InterceptorLogger(l *zap.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		// 预分配足够的容量以提高性能
 		f := make([]zap.Field, 0, len(fields)/2)
 
+		// 将 gRPC 日志字段转换为 Zap 字段
 		for i := 0; i < len(fields); i += 2 {
 			key := fields[i]
 			value := fields[i+1]
 
+			// 根据值类型创建对应的 Zap 字段
 			switch v := value.(type) {
 			case string:
 				f = append(f, zap.String(key.(string), v))
@@ -141,8 +227,11 @@ func InterceptorLogger(l *zap.Logger) logging.Logger {
 				f = append(f, zap.Any(key.(string), v))
 			}
 		}
+
+		// 创建带有调用者跳过和字段的新日志记录器
 		logger := l.WithOptions(zap.AddCallerSkip(1)).With(f...)
 
+		// 根据日志级别记录消息
 		switch lvl {
 		case logging.LevelDebug:
 			logger.Debug(msg)
@@ -153,7 +242,7 @@ func InterceptorLogger(l *zap.Logger) logging.Logger {
 		case logging.LevelError:
 			logger.Error(msg)
 		default:
-			panic(fmt.Sprintf("invalid log level: %v", lvl))
+			panic(fmt.Sprintf("unknown level %v", lvl))
 		}
 	})
 }

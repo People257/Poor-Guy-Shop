@@ -14,14 +14,31 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context, cfg *config.GrpcServerConfig) (*Sever, func()) {
+func InitializeServer(ctx context.Context, cfg *config.GrpcServerConfig) (*Server, func()) {
 	serverConfig := config.GetServerConfig(cfg)
 	logConfig := config.GetLogConfig(cfg)
-	logger, cleanup := internal.NewZapLogger(serverConfig, logConfig)
-	server, cleanup2 := internal.NewGrpcServer(cfg, logger)
-	register := internal.NewRegister(serverConfig)
-	sever := newServer(cfg, server, register)
-	return sever, func() {
+	observabilityConfig := config.GetObservabilityConfig(cfg)
+	exporter, cleanup := internal.NewLogExporter(ctx, observabilityConfig)
+	loggerProvider, cleanup2 := internal.NewLoggerProvider(exporter, serverConfig, observabilityConfig)
+	logger, cleanup3 := internal.NewZapLogger(serverConfig, logConfig, observabilityConfig, loggerProvider)
+	server, cleanup4 := internal.NewGrpcServer(serverConfig, logger)
+	httpServer, cleanup5 := internal.NewObservabilityHttpServer(observabilityConfig)
+	registryConfig := config.GetRegistryConfig(cfg)
+	client := internal.NewConsulClient(registryConfig)
+	register := internal.NewRegister(client, serverConfig)
+	sampler := internal.NewSampler(observabilityConfig)
+	spanExporter, cleanup6 := internal.NewTraceExporter(ctx, observabilityConfig)
+	tracerProvider, cleanup7 := internal.NewTracerProvider(sampler, spanExporter, serverConfig, observabilityConfig)
+	metricExporter := internal.NewMetricExporter(ctx, observabilityConfig)
+	meterProvider, cleanup8 := internal.NewMeterProvider(observabilityConfig, serverConfig, metricExporter)
+	serverServer := newServer(cfg, server, httpServer, register, tracerProvider, meterProvider, client)
+	return serverServer, func() {
+		cleanup8()
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}

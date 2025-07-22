@@ -4,9 +4,9 @@ type RegistryConfig struct {
 	Address string `mapstructure:"address"`
 }
 
-func GetRegistryConfig(config *GrpcServerConfig) *RegistryConfig {
-	if config == nil {
+func GetRegistryConfig(cfg *GrpcServerConfig) *RegistryConfig {
+	if cfg == nil {
 		panic("registry config is nil")
 	}
-	return &config.Registry
+	return &cfg.Registry
 }

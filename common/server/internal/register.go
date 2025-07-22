@@ -2,84 +2,110 @@ package internal
 
 import (
 	"fmt"
-	"github.com/hashicorp/consul/api"
+	capi "github.com/hashicorp/consul/api"
 	"github.com/people257/poor-guy-shop/common/server/config"
 	"go.uber.org/zap"
 	"net"
 )
 
 type Register struct {
-	client    *api.Client
+	client    *capi.Client
 	serverCfg *config.ServerConfig
-	ip        string
-	serviceID string
+	ip        net.IP
 }
 
-func NewConsulClient(registryConfig *config.ServerConfig) *api.Client {
-	cfg := api.DefaultConfig()
-	if registryConfig.Address != "" {
-		cfg.Address = registryConfig.Address
-	}
-	client, err := api.NewClient(cfg)
+func NewRegister(client *capi.Client, serverCfg *config.ServerConfig) *Register {
+	ip, err := getOutboundIP()
 	if err != nil {
-		panic(fmt.Sprintf("failed to create consul client: %v", err))
+		panic(err)
 	}
-	return client
+	return &Register{client: client, serverCfg: serverCfg, ip: ip}
 }
 
-func NewRegister(serverCfg *config.ServerConfig) *Register {
-	ip, err := getOUtboundIP()
+func (r *Register) SetIP(ip net.IP) {
+	r.ip = ip
+}
+
+func (r *Register) CheckAndReRegisterService() error {
+	client := r.client
+	serverCfg := r.serverCfg
+	ip := r.ip
+
+	services, err := client.Agent().Services()
 	if err != nil {
-		panic(fmt.Sprintf("failed to get outbound ip: %v", err))
+		return fmt.Errorf("failed to get services from consul: %w", err)
 	}
+
 	serviceID := fmt.Sprintf("%s-%s-%d", serverCfg.Name, ip, serverCfg.Port)
-	return &Register{
-		client:    NewConsulClient(serverCfg),
-		serverCfg: serverCfg,
-		ip:        ip,
-		serviceID: serviceID,
+
+	if _, exists := services[serviceID]; !exists {
+		zap.L().Info("service not registered, registering now", zap.String("service_id", serviceID))
+		return r.RegisterService()
 	}
-}
 
-func getOUtboundIP() (string, error) {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	return localAddr.IP.String(), nil
+	return nil
 }
 
 func (r *Register) RegisterService() error {
-	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("%s:%d", r.ip, r.serverCfg.Port),
+	client := r.client
+	serverCfg := r.serverCfg
+	ip, err := getOutboundIP()
+	if err != nil {
+		return err
+	}
+
+	check := &capi.AgentServiceCheck{
+		GRPC:                           fmt.Sprintf("%s:%d", ip, serverCfg.Port),
 		Timeout:                        "5s",
 		Interval:                       "10s",
 		DeregisterCriticalServiceAfter: "20s",
 	}
 
-	registration := &api.AgentServiceRegistration{
-		ID:      r.serviceID,
-		Name:    "manage-service",
-		Address: r.ip,
-		Port:    int(r.serverCfg.Port),
+	zap.L().Info("registering service to consul", zap.String("name", serverCfg.Name), zap.String("ip", ip.String()), zap.Uint16("port", serverCfg.Port))
+	err = client.Agent().ServiceRegister(&capi.AgentServiceRegistration{
+		ID:      r.GetServiceIDString(),
+		Name:    serverCfg.Name,
+		Address: ip.String(),
+		Port:    int(serverCfg.Port),
 		Check:   check,
+	})
+	if err != nil {
+		return err
 	}
 
-	zap.L().Info("Registering service to Consul",
-		zap.String("serviceID", r.serviceID),
-		zap.String("ip", r.ip),
-		zap.Int("port", int(r.serverCfg.Port)),
-	)
-
-	return r.client.Agent().ServiceRegister(registration)
-
+	return nil
 }
 
 func (r *Register) DeregisterService() error {
-	zap.L().Info("Deregistering service from Consul", zap.String("serviceID", r.serviceID))
-	return r.client.Agent().ServiceDeregister(r.serviceID)
+	return r.client.Agent().ServiceDeregister(r.GetServiceIDString())
+}
+
+func (r *Register) GetServiceIDString() string {
+	serverCfg := r.serverCfg
+	ip := r.ip
+
+	return fmt.Sprintf("%s-%s-%d", serverCfg.Name, ip.String(), serverCfg.Port)
+}
+
+func NewConsulClient(registryConfig *config.RegistryConfig) *capi.Client {
+	cfg := capi.DefaultConfig()
+	if registryConfig.Address != "" {
+		cfg.Address = registryConfig.Address
+	}
+	client, err := capi.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	return client
+}
+
+func getOutboundIP() (net.IP, error) {
+	conn, err := net.Dial("udp", "1.1.1.1:1")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP, nil
 }
