@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"github.com/people257/poor-guy-shop/common/resolver"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

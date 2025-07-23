@@ -53,7 +53,7 @@ func Gen(configPath string) error {
 		FieldWithTypeTag:  true,  // 生成类型标签
 	}
 	genCfg.WithImportPkgPath("github.com/shopspring/decimal")
-	genCfg.WithImportPkgPath("cnb.cool/cymirror/ces-services/common/db/optimisticlock")
+	genCfg.WithImportPkgPath("github.com/people257/poor-guy-shop/common/db/optimisticlock")
 
 	// 创建代码生成器实例
 	g := gen.NewGenerator(genCfg)
