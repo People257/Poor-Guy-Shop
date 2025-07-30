@@ -2,8 +2,8 @@ package internal
 
 import (
 	"buf.build/go/protovalidate"
-	"github.com/people257/poor-guy-shop/common/server/config"
-	"github.com/people257/poor-guy-shop/common/server/internal/interceptor"
+	"poor-guy-shop/common/server/config"
+	"poor-guy-shop/common/server/internal/interceptor"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"

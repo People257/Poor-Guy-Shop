@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	capi "github.com/hashicorp/consul/api"
-	"github.com/people257/poor-guy-shop/common/server/config"
-	"github.com/people257/poor-guy-shop/common/server/internal"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -16,6 +14,8 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 	"net/http"
+	"poor-guy-shop/common/server/config"
+	"poor-guy-shop/common/server/internal"
 	"time"
 )
 

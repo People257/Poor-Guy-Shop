@@ -3,9 +3,9 @@ package internal
 import (
 	"fmt"
 	capi "github.com/hashicorp/consul/api"
-	"github.com/people257/poor-guy-shop/common/server/config"
 	"go.uber.org/zap"
 	"net"
+	"poor-guy-shop/common/server/config"
 )
 
 type Register struct {

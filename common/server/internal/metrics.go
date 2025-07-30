@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"github.com/people257/poor-guy-shop/common/server/config"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -13,6 +12,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.32.0"
 	"go.uber.org/zap"
 	"os"
+	"poor-guy-shop/common/server/config"
 	"time"
 )
 
