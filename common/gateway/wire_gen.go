@@ -8,8 +8,8 @@ package gateway
 
 import (
 	"context"
-	"github.com/people257/poor-guy-shop/common/gateway/config"
-	"github.com/people257/poor-guy-shop/common/gateway/internal"
+	"poor-guy-shop/common/gateway/config"
+	"poor-guy-shop/common/gateway/internal"
 )
 
 // Injectors from wire.go:

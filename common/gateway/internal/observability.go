@@ -2,10 +2,10 @@ package internal
 
 import (
 	"fmt"
-	"github.com/people257/poor-guy-shop/common/gateway/config"
 	"go.uber.org/zap"
 	"net/http"
 	"net/http/pprof"
+	"poor-guy-shop/common/gateway/config"
 )
 
 func NewObservabilityHttpServer(cfg *config.ObservabilityConfig) (*http.Server, func()) {
