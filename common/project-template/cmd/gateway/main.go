@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "cnb.cool/cymirror/ces-services/common/resolver"
 	"context"
 	"flag"
 	"go.uber.org/zap"
