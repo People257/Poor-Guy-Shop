@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
-	"poor-guy-shop/common/gateway/config"
+	"github.com/people257/poor-guy-shop/common/gateway/config"
 
 	"go.opentelemetry.io/contrib/bridges/otelzap"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"

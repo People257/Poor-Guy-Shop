@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"github.com/people257/poor-guy-shop/common/gateway/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
