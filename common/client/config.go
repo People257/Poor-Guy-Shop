@@ -1,8 +1,8 @@
 package client
 
 import (
-	gatewayconfig "poor-guy-shop/common/gateway/config"
-	grpcconfig "poor-guy-shop/common/server/config"
+	gatewayconfig "github.com/people257/poor-guy-shop/common/gateway/config"
+	grpcconfig "github.com/people257/poor-guy-shop/common/server/config"
 )
 
 type Config struct {

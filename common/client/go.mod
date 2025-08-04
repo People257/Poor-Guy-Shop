@@ -1,4 +1,4 @@
-module poor-guy-shop/common/client
+module github.com/people257/poor-guy-shop/common/client
 
 go 1.24.4
 

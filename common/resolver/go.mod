@@ -1,4 +1,4 @@
-module poor-guy-shop/common/resolver
+module github.com/people257/poor-guy-shop/common/resolver
 
 go 1.24.4
 

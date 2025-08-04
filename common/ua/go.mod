@@ -1,4 +1,4 @@
-module poor-guy-shop/common/ua
+module github.com/people257/poor-guy-shop/common/ua
 
 go 1.24.4
 

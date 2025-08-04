@@ -1,4 +1,4 @@
-module poor-guy-shop/common/rate
+module github.com/people257/poor-guy-shop/common/rate
 
 go 1.24.4
 

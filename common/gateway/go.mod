@@ -1,4 +1,4 @@
-module poor-guy-shop/common/gateway
+module github.com/people257/poor-guy-shop/common/gateway
 
 go 1.24.4
 

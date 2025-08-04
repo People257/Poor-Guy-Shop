@@ -1,4 +1,4 @@
-module poor-guy-shop/common/db
+module github.com/people257/poor-guy-shop/common/db
 
 go 1.24.4
 

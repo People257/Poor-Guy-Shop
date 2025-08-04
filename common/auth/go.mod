@@ -1,4 +1,4 @@
-module poor-guy-shop/common/auth
+module github.com/people257/poor-guy-shop/common/auth
 
 go 1.24.4
 

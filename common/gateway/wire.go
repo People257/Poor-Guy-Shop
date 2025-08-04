@@ -6,8 +6,8 @@ package gateway
 import (
 	"context"
 	"github.com/google/wire"
-	"poor-guy-shop/common/gateway/config"
-	"poor-guy-shop/common/gateway/internal"
+	"github.com/people257/poor-guy-shop/common/gateway/config"
+	"github.com/people257/poor-guy-shop/common/gateway/internal"
 )
 
 func InitializeGateway(

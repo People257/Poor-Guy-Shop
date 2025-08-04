@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/people257/poor-guy-shop/common/server"
 	"google.golang.org/grpc"
-	"poor-guy-shop/common/server"
 	"poor-guy-shop/user-service/cmd/grpc/internal/config"
 )
 

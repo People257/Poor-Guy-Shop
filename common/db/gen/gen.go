@@ -3,6 +3,7 @@ package gen
 import (
 	"flag"
 	"fmt"
+	"github.com/people257/poor-guy-shop/common/conf"
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
@@ -10,7 +11,6 @@ import (
 	"gorm.io/gorm/schema"
 	"os"
 	"path/filepath"
-	"poor-guy-shop/common/conf"
 )
 
 const postgresTcpDSN = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai"

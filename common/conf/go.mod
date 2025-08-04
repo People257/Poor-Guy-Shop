@@ -1,4 +1,4 @@
-module poor-guy-shop/common/conf
+module github.com/people257/poor-guy-shop/common/conf
 
 go 1.24.4
 

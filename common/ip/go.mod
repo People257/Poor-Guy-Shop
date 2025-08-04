@@ -1,4 +1,4 @@
-module poor-guy-shop/common/ip
+module github.com/people257/poor-guy-shop/common/ip
 
 go 1.24.4
 
