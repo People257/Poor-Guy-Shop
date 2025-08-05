@@ -1,0 +1,323 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user/auth/auth.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AuthService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/user/auth/login": {
+      "post": {
+        "summary": "---------------------api--------------------\r\n用户登录",
+        "operationId": "AuthService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authLoginResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authLoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/auth/register/email": {
+      "post": {
+        "summary": "用户邮箱注册",
+        "operationId": "AuthService_EmailRegister",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authRegisterResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authEmailRegisterReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/auth/login/email/otp": {
+      "post": {
+        "summary": "用户邮箱验证码登录",
+        "operationId": "AuthService_OTPLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authLoginResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authOTPLoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/auth/password/retrieve": {
+      "post": {
+        "summary": "找回密码",
+        "operationId": "AuthService_RetrievePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/auth/change/email": {
+      "post": {
+        "summary": "用户换绑邮箱",
+        "operationId": "AuthService_ChangeEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authChangeEmailReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/auth/change/email/otp": {
+      "post": {
+        "summary": "用户换绑邮箱获取验证码",
+        "operationId": "AuthService_ChangeEmailOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authChangeEmailOTPReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "authAuthenticateRPCResp": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户id"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "新的 token，如果需要刷新"
+        },
+        "expires_in": {
+          "type": "string",
+          "format": "int64",
+          "title": "有效期"
+        }
+      }
+    },
+    "authChangeEmailOTPReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "邮箱"
+        },
+        "captcha": {
+          "type": "string",
+          "title": "邮箱验证码"
+        }
+      }
+    },
+    "authChangeEmailReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "邮箱"
+        },
+        "captcha": {
+          "type": "string",
+          "title": "邮箱验证码"
+        }
+      }
+    },
+    "authEmailRegisterReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "邮箱"
+        },
+        "password": {
+          "type": "string",
+          "title": "密码"
+        },
+        "captcha": {
+          "type": "string",
+          "title": "邮箱验证码"
+        },
+        "phone": {
+          "type": "string",
+          "title": "手机号"
+        }
+      }
+    },
+    "authLoginReq": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "title": "用户名、手机号或邮箱"
+        },
+        "password": {
+          "type": "string",
+          "title": "密码"
+        }
+      }
+    },
+    "authLoginResp": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户唯一标识"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "访问令牌"
+        },
+        "refresh_token": {
+          "type": "string",
+          "title": "刷新令牌"
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "title": "令牌有效期(秒)"
+        }
+      }
+    },
+    "authOTPLoginReq": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "title": "用户名、手机号或邮箱"
+        },
+        "captcha": {
+          "type": "string",
+          "title": "验证码"
+        }
+      }
+    },
+    "authRegisterResp": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户唯一标识"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "访问令牌"
+        },
+        "refresh_token": {
+          "type": "string",
+          "title": "刷新令牌"
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "title": "令牌有效期(秒)"
+        }
+      }
+    }
+  }
+}

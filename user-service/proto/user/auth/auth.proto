@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package ces.user.auth;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "/authpb";
+
+service AuthService {
+  // ---------------------api--------------------
+  // 用户登录
+  rpc Login(LoginReq) returns (LoginResp) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/login"
+      body: "*"
+    };
+  }
+
+  // 用户邮箱注册
+  rpc EmailRegister(EmailRegisterReq) returns (RegisterResp) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/register/email"
+      body: "*"
+    };
+  }
+
+  // 用户邮箱验证码登录
+  rpc OTPLogin(OTPLoginReq) returns (LoginResp) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/login/email/otp"
+      body: "*"
+    };
+  }
+
+  // 找回密码
+  rpc RetrievePassword(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/password/retrieve"
+      body: "*"
+    };
+  }
+
+  // 用户换绑邮箱
+  rpc ChangeEmail(ChangeEmailReq) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/change/email"
+      body: "*"
+    };
+  }
+
+  // 用户换绑邮箱获取验证码
+  rpc ChangeEmailOTP(ChangeEmailOTPReq) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/change/email/otp"
+      body: "*"
+    };
+  }
+
+  // ---------------------rpc--------------------
+  // 通过 Metadata Authentication 获取 Token 在 Metadata 中写入 `user_id` 字段
+  rpc AuthenticateRPC(google.protobuf.Empty) returns (AuthenticateRPCResp);
+}
+
+message LoginReq {
+  // 用户名、手机号或邮箱
+  string account = 1;
+  // 密码
+  string password = 2;
+}
+
+message LoginResp {
+  // 用户唯一标识
+  string user_id = 1;
+  // 访问令牌
+  string access_token = 2;
+  // 刷新令牌
+  string refresh_token = 3;
+  // 令牌有效期(秒)
+  int32 expires_in = 4;
+}
+
+message AuthenticateRPCResp {
+  // 用户id
+  string user_id = 1;
+  // 新的 token，如果需要刷新
+  string access_token = 2;
+  // 有效期
+  int64 expires_in = 3;
+}
+
+message EmailRegisterReq {
+  // 邮箱
+  string email = 1;
+  // 密码
+  string password = 2;
+  // 邮箱验证码
+  string captcha = 3;
+  // 手机号
+  string phone = 4;
+}
+
+message RegisterResp {
+  // 用户唯一标识
+  string user_id = 1;
+  // 访问令牌
+  string access_token = 2;
+  // 刷新令牌
+  string refresh_token = 3;
+  // 令牌有效期(秒)
+  int32 expires_in = 4;
+}
+
+message OTPLoginReq {
+  // 用户名、手机号或邮箱
+  string account = 1;
+  // 验证码
+  string captcha = 2;
+}
+
+message RetrievePasswordReq {
+  // 邮箱
+  string email = 1;
+  // 邮箱验证码
+  string captcha = 2;
+  // 新密码
+  string password = 3;
+}
+
+message ChangeEmailReq {
+  // 邮箱
+  string email = 1;
+  // 邮箱验证码
+  string captcha = 2;
+}
+
+message ChangeEmailOTPReq {
+  // 邮箱
+  string email = 1;
+  // 邮箱验证码
+  string captcha = 2;
+}
