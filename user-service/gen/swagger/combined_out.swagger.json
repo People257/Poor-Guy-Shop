@@ -1,13 +1,17 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "user/auth/auth.proto",
-    "version": "version not set"
+    "title": "用户服务",
+    "version": "1.0.0"
   },
   "tags": [
     {
       "name": "AuthService"
     }
+  ],
+  "schemes": [
+    "http",
+    "https"
   ],
   "consumes": [
     "application/json"
@@ -319,5 +323,21 @@
         }
       }
     }
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "externalDocs": {
+    "description": "注意：200 响应中不包含code msg 等统一返回值，仅代表data",
+    "url": "none"
   }
 }
