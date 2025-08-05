@@ -6,7 +6,7 @@ package main
 import (
 	"context"
 	"github.com/google/wire"
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/api"
+
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 	"github.com/people257/poor-guy-shop/user-service/internal/application"
