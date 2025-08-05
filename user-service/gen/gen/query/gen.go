@@ -16,28 +16,64 @@ import (
 )
 
 var (
-	Q = new(Query)
+	Q                = new(Query)
+	Permission       *permission
+	Role             *role
+	RolePermission   *rolePermission
+	User             *user
+	UserLoginLog     *userLoginLog
+	UserOauthBinding *userOauthBinding
+	UserRole         *userRole
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Permission = &Q.Permission
+	Role = &Q.Role
+	RolePermission = &Q.RolePermission
+	User = &Q.User
+	UserLoginLog = &Q.UserLoginLog
+	UserOauthBinding = &Q.UserOauthBinding
+	UserRole = &Q.UserRole
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db: db,
+		db:               db,
+		Permission:       newPermission(db, opts...),
+		Role:             newRole(db, opts...),
+		RolePermission:   newRolePermission(db, opts...),
+		User:             newUser(db, opts...),
+		UserLoginLog:     newUserLoginLog(db, opts...),
+		UserOauthBinding: newUserOauthBinding(db, opts...),
+		UserRole:         newUserRole(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
+
+	Permission       permission
+	Role             role
+	RolePermission   rolePermission
+	User             user
+	UserLoginLog     userLoginLog
+	UserOauthBinding userOauthBinding
+	UserRole         userRole
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db: db,
+		db:               db,
+		Permission:       q.Permission.clone(db),
+		Role:             q.Role.clone(db),
+		RolePermission:   q.RolePermission.clone(db),
+		User:             q.User.clone(db),
+		UserLoginLog:     q.UserLoginLog.clone(db),
+		UserOauthBinding: q.UserOauthBinding.clone(db),
+		UserRole:         q.UserRole.clone(db),
 	}
 }
 
@@ -51,15 +87,37 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db: db,
+		db:               db,
+		Permission:       q.Permission.replaceDB(db),
+		Role:             q.Role.replaceDB(db),
+		RolePermission:   q.RolePermission.replaceDB(db),
+		User:             q.User.replaceDB(db),
+		UserLoginLog:     q.UserLoginLog.replaceDB(db),
+		UserOauthBinding: q.UserOauthBinding.replaceDB(db),
+		UserRole:         q.UserRole.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
+	Permission       IPermissionDo
+	Role             IRoleDo
+	RolePermission   IRolePermissionDo
+	User             IUserDo
+	UserLoginLog     IUserLoginLogDo
+	UserOauthBinding IUserOauthBindingDo
+	UserRole         IUserRoleDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
-	return &queryCtx{}
+	return &queryCtx{
+		Permission:       q.Permission.WithContext(ctx),
+		Role:             q.Role.WithContext(ctx),
+		RolePermission:   q.RolePermission.WithContext(ctx),
+		User:             q.User.WithContext(ctx),
+		UserLoginLog:     q.UserLoginLog.WithContext(ctx),
+		UserOauthBinding: q.UserOauthBinding.WithContext(ctx),
+		UserRole:         q.UserRole.WithContext(ctx),
+	}
 }
 
 func (q *Query) Transaction(fc func(tx *Query) error, opts ...*sql.TxOptions) error {
