@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/people257/poor-guy-shop/common/server"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 	"google.golang.org/grpc"
-	"poor-guy-shop/user-service/cmd/grpc/internal/config"
 )
 
 type Application struct {

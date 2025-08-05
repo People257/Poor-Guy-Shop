@@ -1,15 +1,16 @@
 //go:build wireinject
+// +build wireinject
 
 package main
 
 import (
 	"context"
 	"github.com/google/wire"
-	"github.com/people257/poor-guy-shop/project-template/api"
-	"github.com/people257/poor-guy-shop/project-template/cmd/grpc/internal"
-	"github.com/people257/poor-guy-shop/project-template/cmd/grpc/internal/config"
-	"github.com/people257/poor-guy-shop/project-template/internal/application"
-	"github.com/people257/poor-guy-shop/project-template/internal/infra"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/api"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
+	"github.com/people257/poor-guy-shop/user-service/internal/application"
+	"github.com/people257/poor-guy-shop/user-service/internal/infra"
 )
 
 func InitializeApplication(ctx context.Context, configPath string) (*Application, func()) {

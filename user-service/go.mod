@@ -1,1 +1,1 @@
-module poor-guy-shop/user-service
+module github.com/people257/poor-guy-shop/user-service

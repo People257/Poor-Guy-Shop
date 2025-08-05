@@ -3,10 +3,8 @@ package internal
 import (
 	"fmt"
 	"github.com/people257/poor-guy-shop/common/db"
-	"github.com/people257/poor-guy-shop/project-template/cmd/grpc/internal/config"
-	"github.com/people257/poor-guy-shop/project-template/gen/gen/query"
-	"github.com/redis/go-redis/extra/redisotel/v9"
-	"github.com/redis/go-redis/v9"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
+	"github.com/people257/poor-guy-shop/user-service/gen/gen/query"
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
