@@ -1,0 +1,45 @@
+server:
+  name: "xxx-service"  # 服务名称(注册到服务发现中心的名称)
+  env: "dev"  # 环境,可选值: dev, test, prod
+  port: 8081  # 服务端口
+
+database:
+  host: "127.0.0.1"
+  port: 5432
+  database: "test"
+  user: "root"
+  password: "root"
+
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  user: ""
+  password: ""
+
+observability:
+  port: 16665  # HTTP 可观测性相关端口
+  pprof:
+    enable: false
+  metrics:
+    enable: false
+  trace:
+    enable: false
+    address: "127.0.0.1:4317"  # otel exporter grpc endpoint
+
+registry:
+  address: "127.0.0.1:8500"  # Consul 服务发现中心地址
+
+log:
+  level: "info"
+  file:
+    enable: false
+    directory: "./logs"
+    name: "gateway.log"
+    max_size: 100
+    max_age: 30
+    max_backups: 5
+    compress: true
+    local_time: true
+  console:
+    enable: true
+    format: "console"

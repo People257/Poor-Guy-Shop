@@ -1,0 +1,33 @@
+version: v2
+managed:
+  enabled: false
+plugins:
+  - local: protoc-gen-go
+    out: gen/proto
+    opt: paths=source_relative
+    strategy: directory
+  - local: protoc-gen-go-grpc
+    out: gen/proto
+    opt: paths=source_relative,require_unimplemented_servers=false
+    strategy: directory
+  - local: protoc-gen-grpc-gateway
+    out: gen/proto
+    opt:
+    - paths=source_relative
+    - allow_delete_body=true
+    strategy: directory
+  - local: protoc-gen-openapiv2
+    out: gen/swagger
+    opt:
+      - allow_merge=true
+      - merge_file_name=combined_out
+      - disable_default_errors=true
+      - preserve_rpc_order=true
+      - allow_delete_body=true
+      - enable_rpc_deprecation=true
+      - use_go_templates=true
+      - enums_as_ints=true
+      - json_names_for_fields=false
+    strategy: all
+inputs:
+  - directory: proto
