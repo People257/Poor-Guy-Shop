@@ -1,11 +1,12 @@
 //go:build wireinject
+// +build wireinject
 
 package main
 
 import (
 	"context"
 	"github.com/people257/poor-guy-shop/common/gateway"
-	"github.com/people257/poor-guy-shop/project-template/cmd/gateway/internal/config"
+	"github.com/people257/poor-guy-shop/oss-infra/cmd/gateway/internal"
 
 	"github.com/google/wire"
 )

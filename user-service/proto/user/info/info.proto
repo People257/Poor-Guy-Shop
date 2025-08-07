@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package ces.user.auth;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "/infopb";
+
+service InfoService {
+  // --------------------api---------------------
+  rpc GetUserInfo(google.protobuf.Empty) returns (GetUserInfoResponse) {
+    option (google.api.http) = {
+      get : "/v1/user/info"
+    };
+  }
+
+  rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {
+    option (google.api.http) = {
+      put : "/v1/user/info"
+      body : "*"
+    };
+  }
+}
+
+message GetUserInfoResponse {
+  string user_id = 1;
+  string nickname = 2;
+  string phone = 3;
+  string email = 4;
+  string status = 5;
+  string register_channel = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message UpdateUserInfoRequest {
+  string user_id = 1 [(buf.validate.field).string.uuid = true];
+  string nickname = 2;
+  string phone = 3;
+  string email = 4;
+  string status = 5;
+  string register_channel = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message UpdateUserInfoResponse {
+  string user_id = 1;
+  string nickname = 2;
+  string phone = 3;
+  string email = 4;
+  string status = 5;
+  string register_channel = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
