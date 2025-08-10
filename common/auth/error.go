@@ -5,4 +5,4 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var ErrUnAuthStatus = status.Error(codes.Unauthenticated, "unauthenticated")
+var ErrUnAuthStatus = status.Error(codes.Unauthenticated, "unauthenticate")
