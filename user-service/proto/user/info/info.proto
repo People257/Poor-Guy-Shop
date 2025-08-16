@@ -12,12 +12,13 @@ option go_package = "/infopb";
 
 service InfoService {
   // --------------------api---------------------
+  // 获取用户信息
   rpc GetUserInfo(google.protobuf.Empty) returns (GetUserInfoResponse) {
     option (google.api.http) = {
       get : "/v1/user/info"
     };
   }
-
+  // 更新用户信息
   rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {
     option (google.api.http) = {
       put : "/v1/user/info"

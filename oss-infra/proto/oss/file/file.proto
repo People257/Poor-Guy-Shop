@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package ces.oss.file;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "/filepb";
+
+service FileService {
+  // ---------------------api--------------------
+  // 上传文件
+  rpc UploadFile(UploadFileReq) returns (UploadFileResp) {
+    option (google.api.http) = {
+      post: "/v1/oss/file/upload"
+      body: "*"
+    };
+  }
+
+  // 获取文件下载URL
+  rpc GetDownloadUrl(GetDownloadUrlReq) returns (GetDownloadUrlResp) {
+    option (google.api.http) = {
+      get: "/v1/oss/file/{file_id}/download-url"
+    };
+  }
+
+  // 获取文件信息
+  rpc GetFileInfo(GetFileInfoReq) returns (GetFileInfoResp) {
+    option (google.api.http) = {
+      get: "/v1/oss/file/{file_id}"
+    };
+  }
+
+  // 获取文件列表
+  rpc ListFiles(ListFilesReq) returns (ListFilesResp) {
+    option (google.api.http) = {
+      get: "/v1/oss/file/list"
+    };
+  }
+
+  // 删除文件
+  rpc DeleteFile(DeleteFileReq) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/oss/file/{file_id}"
+    };
+  }
+
+  // ---------------------rpc--------------------
+  // 内部RPC: 验证文件访问权限
+  rpc CheckFileAccess(CheckFileAccessReq) returns (CheckFileAccessResp);
+}
+
+// 文件信息
+message FileInfo {
+  string file_id = 1;
+  string filename = 2;
+  string file_key = 3;
+  int64 file_size = 4;
+  string mime_type = 5;
+  string category = 6;
+  string owner_id = 7;
+  string visibility = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string download_url = 10; // 临时下载URL
+}
+
+// 上传文件请求
+message UploadFileReq {
+  bytes file_data = 1 [(buf.validate.field).required = true]; // 文件数据
+  string filename = 2 [(buf.validate.field).string.min_len = 1]; // 文件名
+  string category = 3; // 文件分类: avatar, product, document
+  string visibility = 4; // 可见性: public, private
+}
+
+message UploadFileResp {
+  FileInfo file_info = 1;
+}
+
+// 获取下载URL请求
+message GetDownloadUrlReq {
+  string file_id = 1 [(buf.validate.field).string.uuid = true];
+  int32 expires_in = 2; // URL有效期(秒)
+}
+
+message GetDownloadUrlResp {
+  string download_url = 1;
+  int32 expires_in = 2;
+}
+
+// 获取文件信息请求
+message GetFileInfoReq {
+  string file_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetFileInfoResp {
+  FileInfo file_info = 1;
+}
+
+// 获取文件列表请求
+message ListFilesReq {
+  string category = 1; // 文件分类筛选
+  int32 page = 2 [(buf.validate.field).int32.gte = 1]; // 页码
+  int32 page_size = 3 [(buf.validate.field).int32.gte = 1, (buf.validate.field).int32.lte = 100]; // 页大小
+}
+
+message ListFilesResp {
+  repeated FileInfo files = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// 删除文件请求
+message DeleteFileReq {
+  string file_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+// 检查文件访问权限请求 (内部RPC)
+message CheckFileAccessReq {
+  string file_id = 1;
+  string user_id = 2;
+}
+
+message CheckFileAccessResp {
+  bool has_access = 1;
+  string reason = 2; // 无权限时的原因
+}

@@ -60,6 +60,14 @@ service AuthService {
     };
   }
 
+  // 刷新令牌
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/refresh-token"
+      body: "*"
+    };
+  }
+
   // ---------------------rpc--------------------
   // 通过 Metadata Authentication 获取 Token 在 Metadata 中写入 `user_id` 字段
   rpc AuthenticateRPC(google.protobuf.Empty) returns (AuthenticateRPCResp);
@@ -142,4 +150,22 @@ message ChangeEmailOTPReq {
   string email = 1;
   // 邮箱验证码
   string captcha = 2;
+}
+
+message RefreshTokenReq {
+  // 刷新令牌
+  string refresh_token = 1;
+}
+
+message RefreshTokenResp {
+  // 用户唯一标识
+  string user_id = 1;
+  // 新的访问令牌
+  string access_token = 2;
+  // 新的刷新令牌
+  string refresh_token = 3;
+  // 访问令牌过期时间（秒）
+  int32 access_expires_in = 4;
+  // 刷新令牌过期时间（秒）
+  int32 refresh_expires_in = 5;
 }

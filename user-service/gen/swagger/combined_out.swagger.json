@@ -7,6 +7,9 @@
   "tags": [
     {
       "name": "AuthService"
+    },
+    {
+      "name": "InfoService"
     }
   ],
   "schemes": [
@@ -22,7 +25,7 @@
   "paths": {
     "/v1/user/auth/login": {
       "post": {
-        "summary": "---------------------api--------------------\r\n用户登录",
+        "summary": "---------------------api--------------------\n用户登录",
         "operationId": "AuthService_Login",
         "responses": {
           "200": {
@@ -185,6 +188,75 @@
           "AuthService"
         ]
       }
+    },
+    "/v1/user/auth/refresh-token": {
+      "post": {
+        "summary": "刷新令牌",
+        "operationId": "AuthService_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authRefreshTokenResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authRefreshTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/user/info": {
+      "get": {
+        "summary": "--------------------api---------------------\n获取用户信息",
+        "operationId": "InfoService_GetUserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authGetUserInfoResponse"
+            }
+          }
+        },
+        "tags": [
+          "InfoService"
+        ]
+      },
+      "put": {
+        "summary": "更新用户信息",
+        "operationId": "InfoService_UpdateUserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authUpdateUserInfoResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authUpdateUserInfoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "InfoService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -253,6 +325,37 @@
         }
       }
     },
+    "authGetUserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "register_channel": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "authLoginReq": {
       "type": "object",
       "properties": {
@@ -301,6 +404,42 @@
         }
       }
     },
+    "authRefreshTokenReq": {
+      "type": "object",
+      "properties": {
+        "refresh_token": {
+          "type": "string",
+          "title": "刷新令牌"
+        }
+      }
+    },
+    "authRefreshTokenResp": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户唯一标识"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "新的访问令牌"
+        },
+        "refresh_token": {
+          "type": "string",
+          "title": "新的刷新令牌"
+        },
+        "access_expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "title": "访问令牌过期时间（秒）"
+        },
+        "refresh_expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "title": "刷新令牌过期时间（秒）"
+        }
+      }
+    },
     "authRegisterResp": {
       "type": "object",
       "properties": {
@@ -320,6 +459,68 @@
           "type": "integer",
           "format": "int32",
           "title": "令牌有效期(秒)"
+        }
+      }
+    },
+    "authUpdateUserInfoRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "register_channel": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "authUpdateUserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "register_channel": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     }
