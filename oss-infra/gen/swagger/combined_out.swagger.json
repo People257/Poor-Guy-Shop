@@ -1,0 +1,319 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "oss",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "FileService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/oss/file/upload": {
+      "post": {
+        "summary": "---------------------api--------------------\n上传文件",
+        "operationId": "FileService_UploadFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fileUploadFileResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/fileUploadFileReq"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/v1/oss/file/{file_id}/download-url": {
+      "get": {
+        "summary": "获取文件下载URL",
+        "operationId": "FileService_GetDownloadUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fileGetDownloadUrlResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "expires_in",
+            "description": "URL有效期(秒)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/v1/oss/file/{file_id}": {
+      "get": {
+        "summary": "获取文件信息",
+        "operationId": "FileService_GetFileInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fileGetFileInfoResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      },
+      "delete": {
+        "summary": "删除文件",
+        "operationId": "FileService_DeleteFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/v1/oss/file/list": {
+      "get": {
+        "summary": "获取文件列表",
+        "operationId": "FileService_ListFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fileListFilesResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "category",
+            "description": "文件分类筛选",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "页码",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "description": "页大小",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "fileCheckFileAccessResp": {
+      "type": "object",
+      "properties": {
+        "has_access": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "title": "无权限时的原因"
+        }
+      }
+    },
+    "fileFileInfo": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "file_key": {
+          "type": "string"
+        },
+        "file_size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "visibility": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "download_url": {
+          "type": "string",
+          "title": "临时下载URL"
+        }
+      },
+      "title": "文件信息"
+    },
+    "fileGetDownloadUrlResp": {
+      "type": "object",
+      "properties": {
+        "download_url": {
+          "type": "string"
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "fileGetFileInfoResp": {
+      "type": "object",
+      "properties": {
+        "file_info": {
+          "$ref": "#/definitions/fileFileInfo"
+        }
+      }
+    },
+    "fileListFilesResp": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/fileFileInfo"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "fileUploadFileReq": {
+      "type": "object",
+      "properties": {
+        "file_data": {
+          "type": "string",
+          "format": "byte",
+          "title": "文件数据"
+        },
+        "filename": {
+          "type": "string",
+          "title": "文件名"
+        },
+        "category": {
+          "type": "string",
+          "title": "文件分类: avatar, product, document"
+        },
+        "visibility": {
+          "type": "string",
+          "title": "可见性: public, private"
+        }
+      },
+      "title": "上传文件请求"
+    },
+    "fileUploadFileResp": {
+      "type": "object",
+      "properties": {
+        "file_info": {
+          "$ref": "#/definitions/fileFileInfo"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "externalDocs": {
+    "description": "注意：200 响应中不包含code msg 等统一返回值，仅代表data",
+    "url": "none"
+  }
+}

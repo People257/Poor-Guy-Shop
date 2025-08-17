@@ -1,165 +1,36 @@
 syntax = "proto3";
 
-package ces.oss.common;
-
-import "protoc-gen-openapiv2/options/annotations.proto";
-
+package ces.user.common;
 option go_package = "/commonpb";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "OSS对象存储服务";
+    title: "oss";
     version: "1.0.0";
-    description: "Poor Guy Shop OSS对象存储服务API文档";
-    contact: {
-      name: "OSS服务开发团队";
-      email: "dev@poorguyshop.com";
-    };
+  };
+  external_docs: {
+    description: "注意：200 响应中不包含code msg 等统一返回值，仅代表data";
+    url: "none";
   };
   schemes: HTTP;
   schemes: HTTPS;
-  consumes: "application/json";
-  produces: "application/json";
   security_definitions: {
     security: {
-      key: "Bearer";
+      key: "ApiKeyAuth";
       value: {
         type: TYPE_API_KEY;
         in: IN_HEADER;
         name: "Authorization";
-        description: "Bearer token authentication. Example: 'Bearer {token}'";
-      };
-    };
+      }
+    }
   };
   security: {
     security_requirement: {
-      key: "Bearer";
+      key: "ApiKeyAuth";
       value: {};
-    };
-  };
-  responses: {
-    key: "400";
-    value: {
-      description: "请求参数错误";
-      schema: {
-        json_schema: {
-          type: OBJECT;
-          properties: {
-            key: "code";
-            value: {
-              type: INTEGER;
-              description: "错误码";
-            };
-          };
-          properties: {
-            key: "message";
-            value: {
-              type: STRING;
-              description: "错误消息";
-            };
-          };
-        };
-      };
-    };
-  };
-  responses: {
-    key: "401";
-    value: {
-      description: "未认证或认证失败";
-      schema: {
-        json_schema: {
-          type: OBJECT;
-          properties: {
-            key: "code";
-            value: {
-              type: INTEGER;
-              description: "错误码";
-            };
-          };
-          properties: {
-            key: "message";
-            value: {
-              type: STRING;
-              description: "错误消息";
-            };
-          };
-        };
-      };
-    };
-  };
-  responses: {
-    key: "403";
-    value: {
-      description: "权限不足";
-      schema: {
-        json_schema: {
-          type: OBJECT;
-          properties: {
-            key: "code";
-            value: {
-              type: INTEGER;
-              description: "错误码";
-            };
-          };
-          properties: {
-            key: "message";
-            value: {
-              type: STRING;
-              description: "错误消息";
-            };
-          };
-        };
-      };
-    };
-  };
-  responses: {
-    key: "404";
-    value: {
-      description: "资源不存在";
-      schema: {
-        json_schema: {
-          type: OBJECT;
-          properties: {
-            key: "code";
-            value: {
-              type: INTEGER;
-              description: "错误码";
-            };
-          };
-          properties: {
-            key: "message";
-            value: {
-              type: STRING;
-              description: "错误消息";
-            };
-          };
-        };
-      };
-    };
-  };
-  responses: {
-    key: "500";
-    value: {
-      description: "服务器内部错误";
-      schema: {
-        json_schema: {
-          type: OBJECT;
-          properties: {
-            key: "code";
-            value: {
-              type: INTEGER;
-              description: "错误码";
-            };
-          };
-          properties: {
-            key: "message";
-            value: {
-              type: STRING;
-              description: "错误消息";
-            };
-          };
-        };
-      };
-    };
+    }
   };
 };
