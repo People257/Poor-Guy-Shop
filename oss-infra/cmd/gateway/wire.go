@@ -6,7 +6,6 @@ package main
 import (
 	"context"
 	"github.com/people257/poor-guy-shop/common/gateway"
-	"github.com/people257/poor-guy-shop/oss-infra/cmd/gateway/internal"
 
 	"github.com/google/wire"
 )

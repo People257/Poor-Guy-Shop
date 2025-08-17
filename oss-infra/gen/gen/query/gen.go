@@ -16,28 +16,39 @@ import (
 )
 
 var (
-	Q = new(Query)
+	Q             = new(Query)
+	File          *file
+	FileAccessLog *fileAccessLog
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	File = &Q.File
+	FileAccessLog = &Q.FileAccessLog
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db: db,
+		db:            db,
+		File:          newFile(db, opts...),
+		FileAccessLog: newFileAccessLog(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
+
+	File          file
+	FileAccessLog fileAccessLog
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db: db,
+		db:            db,
+		File:          q.File.clone(db),
+		FileAccessLog: q.FileAccessLog.clone(db),
 	}
 }
 
@@ -51,15 +62,22 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db: db,
+		db:            db,
+		File:          q.File.replaceDB(db),
+		FileAccessLog: q.FileAccessLog.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
+	File          IFileDo
+	FileAccessLog IFileAccessLogDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
-	return &queryCtx{}
+	return &queryCtx{
+		File:          q.File.WithContext(ctx),
+		FileAccessLog: q.FileAccessLog.WithContext(ctx),
+	}
 }
 
 func (q *Query) Transaction(fc func(tx *Query) error, opts ...*sql.TxOptions) error {

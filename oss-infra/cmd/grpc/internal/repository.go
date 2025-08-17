@@ -2,9 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"github.com/people257/poor-guy-shop/common/cmd/grpc/internal/config"
-	"github.com/people257/poor-guy-shop/common/db"
-	"github.com/people257/poor-guy-shop/common/gen/gen/query"
+	"github.com/people257/poor-guy-shop/oss-infra/cmd/grpc/internal/config"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel"
