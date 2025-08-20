@@ -1,5 +1,5 @@
 server:
-  name: "xxx-service-gateway"  # 服务名称
+  name: "user-service-gateway"  # 服务名称
   env: "dev"  # 环境,可选值: dev, test, prod
   port: 8080  # 服务端口
 
@@ -14,7 +14,7 @@ observability:
     address: "127.0.0.1:4317"  # otel exporter grpc endpoint
 
 registry:
-  service: "xxx-service"  # 要转换为 REST 的 gRPC 服务名称
+  service: "user-service"  # 要转换为 REST 的 gRPC 服务名称
   address: "127.0.0.1:8500"  # Consul 服务发现中心地址
 
 log:
@@ -22,7 +22,7 @@ log:
   file:
     enable: false
     directory: "./logs"
-    name: "gateway.log"
+    name: "user-service-gateway.log"
     max_size: 100
     max_age: 30
     max_backups: 5

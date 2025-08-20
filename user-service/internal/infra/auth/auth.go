@@ -3,9 +3,10 @@ package auth
 import (
 	"context"
 	"errors"
-	"github.com/people257/poor-guy-shop/common/auth"
 	"strings"
 	"time"
+
+	"github.com/people257/poor-guy-shop/common/auth"
 
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
@@ -18,16 +19,16 @@ type Auth struct {
 	refreshThreshold time.Duration // refresh threshold
 }
 
-func NewAuth(cfg *Config) (*Auth, error) {
+func NewAuth(cfg *Config) *Auth {
 	secret := []byte(cfg.Secret)
 	if len(secret) < 32 {
-		return nil, errors.New("secret must be at least 32 bytes")
+		panic("secret must be at least 32 bytes")
 	}
 	return &Auth{
 		secret:           secret,
 		expireDuration:   cfg.ExpireDuration,
 		refreshThreshold: cfg.RefreshThreshold,
-	}, nil
+	}
 }
 
 // VerifyFromMetadata verifies the JWT token in the grpc metadata authorization header.

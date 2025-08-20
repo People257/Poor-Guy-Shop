@@ -17,7 +17,7 @@ type Config struct {
 
 func MustLoad(path string) *Config {
 	_, c := conf.MustLoad[Config](path)
-	return c
+	return &c
 }
 
 func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
@@ -88,11 +88,4 @@ type SMTPConfig struct {
 type EmailTemplate struct {
 	Subject string `mapstructure:"subject"`
 	Body    string `mapstructure:"body"`
-}
-
-func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
-	if cfg == nil {
-		panic("grpc server config is nil")
-	}
-	return &cfg.GrpcServerConfig
 }

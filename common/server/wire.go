@@ -5,9 +5,10 @@ package server
 
 import (
 	"context"
+
 	"github.com/google/wire"
-	"poor-guy-shop/common/server/config"
-	"poor-guy-shop/common/server/internal"
+	"github.com/people257/poor-guy-shop/common/server/config"
+	"github.com/people257/poor-guy-shop/common/server/internal"
 )
 
 func InitializeServer(ctx context.Context, cfg *config.GrpcServerConfig) (*Server, func()) {

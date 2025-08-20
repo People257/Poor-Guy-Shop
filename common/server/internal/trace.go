@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/people257/poor-guy-shop/common/server/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -14,7 +15,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"poor-guy-shop/common/server/config"
 )
 
 func logTraceID(ctx context.Context) logging.Fields {

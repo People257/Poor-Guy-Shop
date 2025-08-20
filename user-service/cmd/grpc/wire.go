@@ -1,16 +1,21 @@
 //go:build wireinject
-// +build wireinject
 
 package main
 
 import (
 	"context"
-	"github.com/google/wire"
+
+	"github.com/people257/poor-guy-shop/user-service/api"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
 
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 	"github.com/people257/poor-guy-shop/user-service/internal/application"
+	"github.com/people257/poor-guy-shop/user-service/internal/domain"
+
 	"github.com/people257/poor-guy-shop/user-service/internal/infra"
+
+	"github.com/google/wire"
+	"github.com/people257/poor-guy-shop/common/server"
 )
 
 func InitializeApplication(ctx context.Context, configPath string) (*Application, func()) {
@@ -19,9 +24,11 @@ func InitializeApplication(ctx context.Context, configPath string) (*Application
 		config.GetGrpcServerConfig,
 
 		config.ConfigProviderSet,
+
 		application.AppProviderSet,
-		api.HandlerProviderSet,
+		api.APIProviderSet,
 		infra.InfraProviderSet,
+		domain.DomainServiceProviderSet,
 		internal.InternalProviderSet,
 
 		server.InitializeServer,

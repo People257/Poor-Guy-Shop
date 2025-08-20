@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"github.com/people257/poor-guy-shop/common/server/config"
 	"go.opentelemetry.io/contrib/bridges/otelzap"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/log"
@@ -12,7 +13,6 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.32.0"
 	"os"
 	"path/filepath"
-	"poor-guy-shop/common/server/config"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"go.uber.org/zap"

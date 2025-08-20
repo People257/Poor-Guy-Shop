@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"flag"
-	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
 	"os"
 	"os/signal"
+
+	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 var configPath = flag.String("f", "etc/config.yaml", "config file path")
