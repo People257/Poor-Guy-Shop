@@ -6,7 +6,7 @@ import (
 	"github.com/people257/poor-guy-shop/common/server"
 	"github.com/people257/poor-guy-shop/user-service/api/auth"
 	"github.com/people257/poor-guy-shop/user-service/api/info"
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 	authpb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/auth"
 	infopb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/info"
 	"google.golang.org/grpc"

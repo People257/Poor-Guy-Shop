@@ -12,7 +12,12 @@ func MustLoad[T any](path string) (*koanf.Koanf, T) {
 		panic(err)
 	}
 	var conf T
-	if err := k.Unmarshal("", &conf); err != nil {
+	// 使用UnmarshalWithConf来支持mapstructure标签
+	unmarshalConfig := koanf.UnmarshalConf{
+		Tag:       "mapstructure",
+		FlatPaths: false,
+	}
+	if err := k.UnmarshalWithConf("", &conf, unmarshalConfig); err != nil {
 		panic(err)
 	}
 	return k, conf

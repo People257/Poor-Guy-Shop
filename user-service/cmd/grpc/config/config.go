@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/people257/poor-guy-shop/common/conf"
 	"github.com/people257/poor-guy-shop/common/db"
 	"github.com/people257/poor-guy-shop/common/server/config"
@@ -10,9 +12,12 @@ type Config struct {
 	config.GrpcServerConfig `mapstructure:",squash"`
 	Redis                   db.RedisConfig    `mapstructure:"redis"`
 	Database                db.DatabaseConfig `mapstructure:"database"`
-	Auth                    AuthConfig        `mapstructure:"auth"`
-	Captcha                 CaptchaConfig     `mapstructure:"captcha"`
+	JWT                     NewJWTConfig      `mapstructure:"jwt"`
+	Captcha                 NewCaptchaConfig  `mapstructure:"captcha"`
 	Email                   EmailConfig       `mapstructure:"email"`
+
+	// 保持向后兼容
+	Auth AuthConfig `mapstructure:"auth"`
 }
 
 func MustLoad(path string) *Config {
@@ -88,4 +93,32 @@ type SMTPConfig struct {
 type EmailTemplate struct {
 	Subject string `mapstructure:"subject"`
 	Body    string `mapstructure:"body"`
+}
+
+// 新的简化JWTConfig (user-service-1风格)
+type NewJWTConfig struct {
+	Secret                   string        `mapstructure:"secret"`
+	ExpireDuration           time.Duration `mapstructure:"expire_duration"`
+	RefreshThresholdDuration time.Duration `mapstructure:"refresh_threshold_duration"`
+}
+
+// 新的简化CaptchaConfig (user-service-1风格)
+type NewCaptchaConfig struct {
+	Provider       string `mapstructure:"provider"`
+	Secret         string `mapstructure:"secret"`
+	Endpoint       string `mapstructure:"endpoint"`
+	ExpectedDomain string `mapstructure:"expected_domain"`
+}
+
+// 向后兼容的配置获取器
+func GetJWTConfig(cfg *Config) *NewJWTConfig {
+	return &cfg.JWT
+}
+
+func GetCaptchaConfigNew(cfg *Config) *NewCaptchaConfig {
+	return &cfg.Captcha
+}
+
+func GetEmailConfig(cfg *Config) *EmailConfig {
+	return &cfg.Email
 }

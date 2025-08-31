@@ -12,8 +12,8 @@ import (
 	"github.com/people257/poor-guy-shop/common/server"
 	auth4 "github.com/people257/poor-guy-shop/user-service/api/auth"
 	info2 "github.com/people257/poor-guy-shop/user-service/api/info"
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 	auth3 "github.com/people257/poor-guy-shop/user-service/internal/application/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/application/info"
 	auth2 "github.com/people257/poor-guy-shop/user-service/internal/domain/auth"
@@ -38,16 +38,17 @@ func InitializeApplication(ctx context.Context, configPath2 string) (*Applicatio
 	converter := user.NewConverter()
 	userRepository := repository.NewUserRepository(gormDB, query, converter)
 	domainService := user.NewDomainService(userRepository)
-	authConfig := infra.ProvideAuthInfraConfig(configConfig)
+	jwtConfig := ProvideInternalJWTConfig(configConfig)
+	authConfig := infra.ProvideAuthInfraConfig(jwtConfig)
 	authAuth := auth.NewAuth(authConfig)
 	redisConfig := config.GetRedisConfig(configConfig)
 	universalClient := db.NewRedis(redisConfig)
 	client := internal.ProvideRedisClient(universalClient)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(client)
 	service := auth.NewTokenService(authAuth, refreshTokenRepository)
-	emailConfig := infra.ProvideEmailConfig(configConfig)
+	emailConfig := ProvideInternalEmailConfig(configConfig)
 	emailService := email.NewSMTPService(emailConfig)
-	captchaConfig := infra.ProvideCaptchaConfig(configConfig)
+	captchaConfig := ProvideInternalCaptchaConfig(configConfig)
 	captchaService := captcha.NewEmailCaptchaService(emailService, client, captchaConfig)
 	authDomainService := auth2.NewDomainService(service, captchaService, refreshTokenRepository)
 	authService := auth3.NewService(domainService, authDomainService, userRepository)

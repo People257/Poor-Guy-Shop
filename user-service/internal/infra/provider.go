@@ -17,8 +17,5 @@ var InfraProviderSet = wire.NewSet(
 	email.NewSMTPService,
 	captcha.NewEmailCaptchaService,
 	// 配置提供者
-	ProvideEmailConfig,
-	ProvideCaptchaConfig,
-	ProvideAuthConfig,
 	ProvideAuthInfraConfig,
 )

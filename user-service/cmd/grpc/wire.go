@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"github.com/people257/poor-guy-shop/user-service/api"
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
+	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
 
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
 	"github.com/people257/poor-guy-shop/user-service/internal/application"
@@ -22,8 +22,13 @@ func InitializeApplication(ctx context.Context, configPath string) (*Application
 	panic(wire.Build(
 		config.MustLoad,
 		config.GetGrpcServerConfig,
+		config.GetDBConfig,
+		config.GetRedisConfig,
 
-		config.ConfigProviderSet,
+		// 配置转换器
+		ProvideInternalEmailConfig,
+		ProvideInternalCaptchaConfig,
+		ProvideInternalJWTConfig,
 
 		application.AppProviderSet,
 		api.APIProviderSet,

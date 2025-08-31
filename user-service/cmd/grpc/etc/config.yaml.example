@@ -1,20 +1,46 @@
 server:
-  name: "xxx-service"  # 服务名称(注册到服务发现中心的名称)
+  name: "user-service"  # 服务名称(注册到服务发现中心的名称)
   env: "dev"  # 环境,可选值: dev, test, prod
   port: 8081  # 服务端口
 
 database:
-  host: "127.0.0.1"
-  port: 5432
-  database: "test"
-  user: "root"
-  password: "root"
+  master:
+    host: "127.0.0.1"
+    user: "postgres"
+    password: "root"
+    database: "test"
+    port: 5432
+  replicas: []
 
 redis:
   host: "127.0.0.1"
   port: 6379
   user: ""
   password: ""
+
+jwt:
+  secret: "your-secret-key-here-at-least-32-bytes-long-1234567890"
+  expire_duration: "24h"
+  refresh_threshold_duration: "48h"
+
+captcha:
+  provider: "cloudflare_turnstile"
+  secret: "your-captcha-secret-key"
+  endpoint: "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+  expected_domain: "example.com"
+
+email:
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "your-email@gmail.com"
+    password: "your-password"
+    from: "your-email@gmail.com"
+    use_tls: true
+  templates:
+    verification:
+      subject: "Email Verification"
+      body: "Your verification code is: {{.Code}}"
 
 observability:
   port: 16665  # HTTP 可观测性相关端口

@@ -8,7 +8,7 @@ import (
 	"net/smtp"
 	"text/template"
 
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
+	"github.com/people257/poor-guy-shop/user-service/internal/config"
 )
 
 // Service 邮件服务接口

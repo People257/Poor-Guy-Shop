@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/config"
+	"github.com/people257/poor-guy-shop/user-service/internal/config"
 
 	"github.com/people257/poor-guy-shop/user-service/internal/domain/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/infra/email"

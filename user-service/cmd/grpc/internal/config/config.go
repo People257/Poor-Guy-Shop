@@ -1,23 +1,33 @@
 package config
 
 import (
+	"time"
+
 	"github.com/people257/poor-guy-shop/common/conf"
 	"github.com/people257/poor-guy-shop/common/db"
 	"github.com/people257/poor-guy-shop/common/server/config"
 )
 
+type DatabaseConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     uint16 `mapstructure:"port"`
+	Database string `mapstructure:"database"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
+}
+
 type Config struct {
 	config.GrpcServerConfig `mapstructure:",squash"`
-	Redis                   db.RedisConfig    `mapstructure:"redis"`
 	Database                db.DatabaseConfig `mapstructure:"database"`
-	Auth                    AuthConfig        `mapstructure:"auth"`
+	Redis                   db.RedisConfig    `mapstructure:"redis"`
+	JWT                     JWTConfig         `mapstructure:"jwt"`
 	Captcha                 CaptchaConfig     `mapstructure:"captcha"`
 	Email                   EmailConfig       `mapstructure:"email"`
 }
 
 func MustLoad(path string) *Config {
 	_, c := conf.MustLoad[Config](path)
-	return c
+	return &c
 }
 
 func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
@@ -41,33 +51,33 @@ func GetRedisConfig(cfg *Config) *db.RedisConfig {
 	return &cfg.Redis
 }
 
-// AuthConfig JWT认证配置
-type AuthConfig struct {
-	JWT JWTConfig `mapstructure:"jwt"`
-}
-
+// JWTConfig JWT认证配置
 type JWTConfig struct {
-	AccessToken  TokenConfig `mapstructure:"access_token"`
-	RefreshToken TokenConfig `mapstructure:"refresh_token"`
+	Secret                   string        `mapstructure:"secret"`
+	ExpireDuration           time.Duration `mapstructure:"expire_duration"`            // Token 过期时间
+	RefreshThresholdDuration time.Duration `mapstructure:"refresh_threshold_duration"` //刷新门限
 }
 
-type TokenConfig struct {
-	Secret    string `mapstructure:"secret"`
-	ExpiresIn int    `mapstructure:"expires_in"`
-	Issuer    string `mapstructure:"issuer"`
+func GetJWTConfig(cfg *Config) *JWTConfig {
+	if cfg == nil {
+		panic("jwt config is nil")
+	}
+	return &cfg.JWT
 }
 
 // CaptchaConfig 验证码配置
 type CaptchaConfig struct {
-	Email EmailCaptchaConfig `mapstructure:"email"`
+	Provider       string `mapstructure:"provider"`        // Captcha 服务提供商
+	Secret         string `mapstructure:"secret"`          // Captcha 密钥
+	Endpoint       string `mapstructure:"endpoint"`        // Captcha 服务端点
+	ExpectedDomain string `mapstructure:"expected_domain"` // 预期的域名
 }
 
-type EmailCaptchaConfig struct {
-	Enabled      bool `mapstructure:"enabled"`
-	CodeLength   int  `mapstructure:"code_length"`
-	ExpiresIn    int  `mapstructure:"expires_in"`
-	SendInterval int  `mapstructure:"send_interval"`
-	DailyLimit   int  `mapstructure:"daily_limit"`
+func GetCaptchaConfig(cfg *Config) *CaptchaConfig {
+	if cfg == nil {
+		panic("captcha config is nil")
+	}
+	return &cfg.Captcha
 }
 
 // EmailConfig 邮件配置
@@ -90,9 +100,9 @@ type EmailTemplate struct {
 	Body    string `mapstructure:"body"`
 }
 
-func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
+func GetEmailConfig(cfg *Config) *EmailConfig {
 	if cfg == nil {
-		panic("grpc server config is nil")
+		panic("email config is nil")
 	}
-	return &cfg.GrpcServerConfig
+	return &cfg.Email
 }
