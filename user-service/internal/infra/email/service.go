@@ -6,7 +6,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/smtp"
+	"strings"
 	"text/template"
+	"time"
 
 	"github.com/people257/poor-guy-shop/user-service/internal/config"
 )
@@ -64,9 +66,8 @@ func (s *SMTPService) SendTemplate(ctx context.Context, templateName, to string,
 
 // SendText 发送纯文本邮件
 func (s *SMTPService) SendText(ctx context.Context, to, subject, body string) error {
-	// 构建邮件内容
-	message := fmt.Sprintf("To: %s\r\nSubject: %s\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s",
-		to, subject, body)
+	// 构建符合RFC标准的邮件内容
+	message := s.buildRFC5322Message(to, subject, body)
 
 	// SMTP服务器地址
 	addr := fmt.Sprintf("%s:%d", s.config.SMTP.Host, s.config.SMTP.Port)
@@ -74,56 +75,62 @@ func (s *SMTPService) SendText(ctx context.Context, to, subject, body string) er
 	// 创建认证
 	auth := smtp.PlainAuth("", s.config.SMTP.Username, s.config.SMTP.Password, s.config.SMTP.Host)
 
-	// 如果使用TLS，需要特殊处理
+	// 如果使用TLS，使用STARTTLS方式
 	if s.config.SMTP.UseTLS {
-		return s.sendWithTLS(addr, auth, s.config.SMTP.From, []string{to}, []byte(message))
+		err := s.sendWithSTARTTLS(addr, auth, s.config.SMTP.From, []string{to}, []byte(message))
+		if err != nil {
+			return fmt.Errorf("STARTTLS邮件发送失败 [%s -> %s]: %w", s.config.SMTP.From, to, err)
+		}
+		return nil
 	}
 
 	// 普通SMTP发送
-	return smtp.SendMail(addr, auth, s.config.SMTP.From, []string{to}, []byte(message))
+	err := smtp.SendMail(addr, auth, s.config.SMTP.From, []string{to}, []byte(message))
+	if err != nil {
+		return fmt.Errorf("SMTP邮件发送失败 [%s:%d, %s -> %s]: %w", s.config.SMTP.Host, s.config.SMTP.Port, s.config.SMTP.From, to, err)
+	}
+	return nil
 }
 
-// sendWithTLS 使用TLS发送邮件
-func (s *SMTPService) sendWithTLS(addr string, auth smtp.Auth, from string, to []string, msg []byte) error {
-	// 创建TLS连接
+// sendWithSTARTTLS 使用STARTTLS发送邮件（适用于587端口）
+func (s *SMTPService) sendWithSTARTTLS(addr string, auth smtp.Auth, from string, to []string, msg []byte) error {
+	// 创建普通TCP连接
+	conn, err := smtp.Dial(addr)
+	if err != nil {
+		return fmt.Errorf("连接SMTP服务器失败: %w", err)
+	}
+	defer conn.Quit()
+
+	// 启动TLS
 	tlsConfig := &tls.Config{
 		ServerName: s.config.SMTP.Host,
 	}
 
-	conn, err := tls.Dial("tcp", addr, tlsConfig)
-	if err != nil {
-		return fmt.Errorf("TLS连接失败: %w", err)
+	if err = conn.StartTLS(tlsConfig); err != nil {
+		return fmt.Errorf("启动TLS失败: %w", err)
 	}
-	defer conn.Close()
-
-	// 创建SMTP客户端
-	client, err := smtp.NewClient(conn, s.config.SMTP.Host)
-	if err != nil {
-		return fmt.Errorf("创建SMTP客户端失败: %w", err)
-	}
-	defer client.Quit()
 
 	// 认证
 	if auth != nil {
-		if err := client.Auth(auth); err != nil {
+		if err = conn.Auth(auth); err != nil {
 			return fmt.Errorf("SMTP认证失败: %w", err)
 		}
 	}
 
 	// 设置发件人
-	if err := client.Mail(from); err != nil {
+	if err = conn.Mail(from); err != nil {
 		return fmt.Errorf("设置发件人失败: %w", err)
 	}
 
 	// 设置收件人
 	for _, recipient := range to {
-		if err := client.Rcpt(recipient); err != nil {
+		if err = conn.Rcpt(recipient); err != nil {
 			return fmt.Errorf("设置收件人失败: %w", err)
 		}
 	}
 
 	// 发送邮件内容
-	writer, err := client.Data()
+	writer, err := conn.Data()
 	if err != nil {
 		return fmt.Errorf("获取邮件写入器失败: %w", err)
 	}
@@ -139,4 +146,34 @@ func (s *SMTPService) sendWithTLS(addr string, auth smtp.Auth, from string, to [
 	}
 
 	return nil
+}
+
+// buildRFC5322Message 构建符合RFC5322标准的邮件消息
+func (s *SMTPService) buildRFC5322Message(to, subject, body string) string {
+	var message strings.Builder
+
+	// 必需的头部字段
+	message.WriteString(fmt.Sprintf("From: %s\r\n", s.config.SMTP.From))
+	message.WriteString(fmt.Sprintf("To: %s\r\n", to))
+	message.WriteString(fmt.Sprintf("Subject: %s\r\n", subject))
+
+	// MIME相关头部
+	message.WriteString("MIME-Version: 1.0\r\n")
+	message.WriteString("Content-Type: text/plain; charset=UTF-8\r\n")
+	message.WriteString("Content-Transfer-Encoding: 8bit\r\n")
+
+	// 可选但推荐的头部
+	message.WriteString(fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z)))
+	message.WriteString("X-Mailer: User-Service-SMTP/1.0\r\n")
+
+	// 消息ID（可选但有助于追踪）
+	message.WriteString(fmt.Sprintf("Message-ID: <%d.%s>\r\n", time.Now().UnixNano(), s.config.SMTP.From))
+
+	// 空行分隔头部和正文
+	message.WriteString("\r\n")
+
+	// 邮件正文
+	message.WriteString(body)
+
+	return message.String()
 }
