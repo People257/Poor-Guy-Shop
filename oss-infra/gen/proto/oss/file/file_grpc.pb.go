@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,32 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FileService_UploadFile_FullMethodName      = "/ces.oss.file.FileService/UploadFile"
-	FileService_GetDownloadUrl_FullMethodName  = "/ces.oss.file.FileService/GetDownloadUrl"
-	FileService_GetFileInfo_FullMethodName     = "/ces.oss.file.FileService/GetFileInfo"
-	FileService_ListFiles_FullMethodName       = "/ces.oss.file.FileService/ListFiles"
-	FileService_DeleteFile_FullMethodName      = "/ces.oss.file.FileService/DeleteFile"
-	FileService_CheckFileAccess_FullMethodName = "/ces.oss.file.FileService/CheckFileAccess"
+	FileService_UploadFile_FullMethodName     = "/ces.oss.file.FileService/UploadFile"
+	FileService_GetDownloadUrl_FullMethodName = "/ces.oss.file.FileService/GetDownloadUrl"
 )
 
 // FileServiceClient is the client API for FileService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileServiceClient interface {
-	// ---------------------api--------------------
 	// 上传文件
 	UploadFile(ctx context.Context, in *UploadFileReq, opts ...grpc.CallOption) (*UploadFileResp, error)
 	// 获取文件下载URL
 	GetDownloadUrl(ctx context.Context, in *GetDownloadUrlReq, opts ...grpc.CallOption) (*GetDownloadUrlResp, error)
-	// 获取文件信息
-	GetFileInfo(ctx context.Context, in *GetFileInfoReq, opts ...grpc.CallOption) (*GetFileInfoResp, error)
-	// 获取文件列表
-	ListFiles(ctx context.Context, in *ListFilesReq, opts ...grpc.CallOption) (*ListFilesResp, error)
-	// 删除文件
-	DeleteFile(ctx context.Context, in *DeleteFileReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ---------------------rpc--------------------
-	// 内部RPC: 验证文件访问权限
-	CheckFileAccess(ctx context.Context, in *CheckFileAccessReq, opts ...grpc.CallOption) (*CheckFileAccessResp, error)
 }
 
 type fileServiceClient struct {
@@ -76,64 +61,14 @@ func (c *fileServiceClient) GetDownloadUrl(ctx context.Context, in *GetDownloadU
 	return out, nil
 }
 
-func (c *fileServiceClient) GetFileInfo(ctx context.Context, in *GetFileInfoReq, opts ...grpc.CallOption) (*GetFileInfoResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetFileInfoResp)
-	err := c.cc.Invoke(ctx, FileService_GetFileInfo_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *fileServiceClient) ListFiles(ctx context.Context, in *ListFilesReq, opts ...grpc.CallOption) (*ListFilesResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListFilesResp)
-	err := c.cc.Invoke(ctx, FileService_ListFiles_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *fileServiceClient) DeleteFile(ctx context.Context, in *DeleteFileReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, FileService_DeleteFile_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *fileServiceClient) CheckFileAccess(ctx context.Context, in *CheckFileAccessReq, opts ...grpc.CallOption) (*CheckFileAccessResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckFileAccessResp)
-	err := c.cc.Invoke(ctx, FileService_CheckFileAccess_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // FileServiceServer is the server API for FileService service.
 // All implementations should embed UnimplementedFileServiceServer
 // for forward compatibility.
 type FileServiceServer interface {
-	// ---------------------api--------------------
 	// 上传文件
 	UploadFile(context.Context, *UploadFileReq) (*UploadFileResp, error)
 	// 获取文件下载URL
 	GetDownloadUrl(context.Context, *GetDownloadUrlReq) (*GetDownloadUrlResp, error)
-	// 获取文件信息
-	GetFileInfo(context.Context, *GetFileInfoReq) (*GetFileInfoResp, error)
-	// 获取文件列表
-	ListFiles(context.Context, *ListFilesReq) (*ListFilesResp, error)
-	// 删除文件
-	DeleteFile(context.Context, *DeleteFileReq) (*emptypb.Empty, error)
-	// ---------------------rpc--------------------
-	// 内部RPC: 验证文件访问权限
-	CheckFileAccess(context.Context, *CheckFileAccessReq) (*CheckFileAccessResp, error)
 }
 
 // UnimplementedFileServiceServer should be embedded to have
@@ -148,18 +83,6 @@ func (UnimplementedFileServiceServer) UploadFile(context.Context, *UploadFileReq
 }
 func (UnimplementedFileServiceServer) GetDownloadUrl(context.Context, *GetDownloadUrlReq) (*GetDownloadUrlResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDownloadUrl not implemented")
-}
-func (UnimplementedFileServiceServer) GetFileInfo(context.Context, *GetFileInfoReq) (*GetFileInfoResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFileInfo not implemented")
-}
-func (UnimplementedFileServiceServer) ListFiles(context.Context, *ListFilesReq) (*ListFilesResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListFiles not implemented")
-}
-func (UnimplementedFileServiceServer) DeleteFile(context.Context, *DeleteFileReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
-}
-func (UnimplementedFileServiceServer) CheckFileAccess(context.Context, *CheckFileAccessReq) (*CheckFileAccessResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckFileAccess not implemented")
 }
 func (UnimplementedFileServiceServer) testEmbeddedByValue() {}
 
@@ -217,78 +140,6 @@ func _FileService_GetDownloadUrl_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FileService_GetFileInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFileInfoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileServiceServer).GetFileInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileService_GetFileInfo_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).GetFileInfo(ctx, req.(*GetFileInfoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _FileService_ListFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListFilesReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileServiceServer).ListFiles(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileService_ListFiles_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).ListFiles(ctx, req.(*ListFilesReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _FileService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteFileReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileServiceServer).DeleteFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileService_DeleteFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).DeleteFile(ctx, req.(*DeleteFileReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _FileService_CheckFileAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckFileAccessReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileServiceServer).CheckFileAccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileService_CheckFileAccess_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileServiceServer).CheckFileAccess(ctx, req.(*CheckFileAccessReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // FileService_ServiceDesc is the grpc.ServiceDesc for FileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -303,22 +154,6 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDownloadUrl",
 			Handler:    _FileService_GetDownloadUrl_Handler,
-		},
-		{
-			MethodName: "GetFileInfo",
-			Handler:    _FileService_GetFileInfo_Handler,
-		},
-		{
-			MethodName: "ListFiles",
-			Handler:    _FileService_ListFiles_Handler,
-		},
-		{
-			MethodName: "DeleteFile",
-			Handler:    _FileService_DeleteFile_Handler,
-		},
-		{
-			MethodName: "CheckFileAccess",
-			Handler:    _FileService_CheckFileAccess_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

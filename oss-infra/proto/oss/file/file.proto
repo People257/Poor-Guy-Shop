@@ -11,7 +11,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 option go_package = "/filepb";
 
 service FileService {
-  // ---------------------api--------------------
   // 上传文件
   rpc UploadFile(UploadFileReq) returns (UploadFileResp) {
     option (google.api.http) = {
@@ -26,31 +25,6 @@ service FileService {
       get: "/v1/oss/file/{file_id}/download-url"
     };
   }
-
-  // 获取文件信息
-  rpc GetFileInfo(GetFileInfoReq) returns (GetFileInfoResp) {
-    option (google.api.http) = {
-      get: "/v1/oss/file/{file_id}"
-    };
-  }
-
-  // 获取文件列表
-  rpc ListFiles(ListFilesReq) returns (ListFilesResp) {
-    option (google.api.http) = {
-      get: "/v1/oss/file/list"
-    };
-  }
-
-  // 删除文件
-  rpc DeleteFile(DeleteFileReq) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/v1/oss/file/{file_id}"
-    };
-  }
-
-  // ---------------------rpc--------------------
-  // 内部RPC: 验证文件访问权限
-  rpc CheckFileAccess(CheckFileAccessReq) returns (CheckFileAccessResp);
 }
 
 // 文件信息
@@ -90,41 +64,4 @@ message GetDownloadUrlResp {
   int32 expires_in = 2;
 }
 
-// 获取文件信息请求
-message GetFileInfoReq {
-  string file_id = 1 [(buf.validate.field).string.uuid = true];
-}
 
-message GetFileInfoResp {
-  FileInfo file_info = 1;
-}
-
-// 获取文件列表请求
-message ListFilesReq {
-  string category = 1; // 文件分类筛选
-  int32 page = 2 [(buf.validate.field).int32.gte = 1]; // 页码
-  int32 page_size = 3 [(buf.validate.field).int32.gte = 1, (buf.validate.field).int32.lte = 100]; // 页大小
-}
-
-message ListFilesResp {
-  repeated FileInfo files = 1;
-  int64 total = 2;
-  int32 page = 3;
-  int32 page_size = 4;
-}
-
-// 删除文件请求
-message DeleteFileReq {
-  string file_id = 1 [(buf.validate.field).string.uuid = true];
-}
-
-// 检查文件访问权限请求 (内部RPC)
-message CheckFileAccessReq {
-  string file_id = 1;
-  string user_id = 2;
-}
-
-message CheckFileAccessResp {
-  bool has_access = 1;
-  string reason = 2; // 无权限时的原因
-}

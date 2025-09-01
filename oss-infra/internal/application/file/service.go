@@ -3,8 +3,11 @@ package file
 import (
 	"context"
 	"fmt"
+	"mime"
+	"path/filepath"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/people257/poor-guy-shop/oss-infra/internal/domain/file"
 )
 
@@ -55,51 +58,6 @@ type GetDownloadURLResp struct {
 	ExpiresIn   int32
 }
 
-// GetFileInfoReq 获取文件信息请求
-type GetFileInfoReq struct {
-	FileID string
-	UserID string // 从认证中间件获取
-}
-
-// GetFileInfoResp 获取文件信息响应
-type GetFileInfoResp struct {
-	FileInfo *FileInfoDTO
-}
-
-// ListFilesReq 获取文件列表请求
-type ListFilesReq struct {
-	Category string
-	Page     int32
-	PageSize int32
-	UserID   string // 从认证中间件获取
-}
-
-// ListFilesResp 获取文件列表响应
-type ListFilesResp struct {
-	Files    []*FileInfoDTO
-	Total    int64
-	Page     int32
-	PageSize int32
-}
-
-// DeleteFileReq 删除文件请求
-type DeleteFileReq struct {
-	FileID string
-	UserID string // 从认证中间件获取
-}
-
-// CheckFileAccessReq 检查文件访问权限请求
-type CheckFileAccessReq struct {
-	FileID string
-	UserID string
-}
-
-// CheckFileAccessResp 检查文件访问权限响应
-type CheckFileAccessResp struct {
-	HasAccess bool
-	Reason    string
-}
-
 // FileInfoDTO 文件信息DTO
 type FileInfoDTO struct {
 	FileID      string
@@ -116,35 +74,75 @@ type FileInfoDTO struct {
 
 // UploadFile 上传文件
 func (s *Service) UploadFile(ctx context.Context, req *UploadFileReq) (*UploadFileResp, error) {
-	// 创建文件领域对象
-	fileEntity, err := s.fileDomain.CreateFile(&file.CreateFileReq{
-		FileData:   req.FileData,
+	// 参数验证
+	if len(req.FileData) == 0 {
+		return nil, fmt.Errorf("文件数据不能为空")
+	}
+	if req.Filename == "" {
+		return nil, fmt.Errorf("文件名不能为空")
+	}
+
+	// 生成文件ID和文件键
+	fileID := uuid.New().String()
+	fileKey := s.generateFileKey(req.UserID, fileID, req.Filename)
+
+	// 检测MIME类型
+	mimeType := mime.TypeByExtension(filepath.Ext(req.Filename))
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	// 设置默认值
+	if req.Category == "" {
+		req.Category = "general"
+	}
+	if req.Visibility == "" {
+		req.Visibility = "private"
+	}
+
+	// 文件大小验证
+	err := s.fileDomain.ValidateFileSize(int64(len(req.FileData)))
+	if err != nil {
+		return nil, fmt.Errorf("文件大小验证失败: %w", err)
+	}
+
+	// 文件类型验证
+	err = s.fileDomain.ValidateFileType(mimeType)
+	if err != nil {
+		return nil, fmt.Errorf("文件类型验证失败: %w", err)
+	}
+
+	// 上传到存储系统
+	err = s.storageRepo.UploadFile(ctx, fileKey, req.FileData)
+	if err != nil {
+		return nil, fmt.Errorf("文件上传失败: %w", err)
+	}
+
+	// 创建文件实体
+	fileEntity := &file.File{
+		ID:         fileID,
 		Filename:   req.Filename,
+		FileKey:    fileKey,
+		FileSize:   int64(len(req.FileData)),
+		MimeType:   mimeType,
 		Category:   req.Category,
-		Visibility: req.Visibility,
 		OwnerID:    req.UserID,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("创建文件失败: %w", err)
+		Visibility: req.Visibility,
+		Status:     1, // 正常状态
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
-	// 存储文件到存储系统
-	err = s.storageRepo.SaveFile(ctx, &file.SaveFileReq{
-		FileKey:  fileEntity.FileKey,
-		FileData: req.FileData,
-		MimeType: fileEntity.MimeType,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("存储文件失败: %w", err)
-	}
-
-	// 保存文件信息到数据库
+	// 保存文件记录
 	err = s.fileRepo.Create(ctx, fileEntity)
 	if err != nil {
-		// 如果数据库保存失败，删除已上传的文件
-		_ = s.storageRepo.DeleteFile(ctx, fileEntity.FileKey)
-		return nil, fmt.Errorf("保存文件信息失败: %w", err)
+		// 如果数据库保存失败，尝试清理已上传的文件
+		_ = s.storageRepo.DeleteFile(ctx, fileKey)
+		return nil, fmt.Errorf("保存文件记录失败: %w", err)
 	}
+
+	// 生成临时下载URL
+	downloadURL, _ := s.storageRepo.GenerateDownloadURL(ctx, fileKey, 3600)
 
 	// 记录访问日志
 	_ = s.fileRepo.CreateAccessLog(ctx, &file.FileAccessLog{
@@ -155,12 +153,6 @@ func (s *Service) UploadFile(ctx context.Context, req *UploadFileReq) (*UploadFi
 		StatusCode: func() *int16 { code := int16(200); return &code }(),
 		AccessedAt: time.Now(),
 	})
-
-	// 生成下载URL
-	downloadURL, err := s.storageRepo.GenerateDownloadURL(ctx, fileEntity.FileKey, 3600) // 1小时
-	if err != nil {
-		downloadURL = "" // 忽略错误，不影响上传
-	}
 
 	return &UploadFileResp{
 		FileInfo: &FileInfoDTO{
@@ -180,7 +172,7 @@ func (s *Service) UploadFile(ctx context.Context, req *UploadFileReq) (*UploadFi
 
 // GetDownloadURL 获取文件下载URL
 func (s *Service) GetDownloadURL(ctx context.Context, req *GetDownloadURLReq) (*GetDownloadURLResp, error) {
-	// 检查文件是否存在和权限
+	// 获取文件信息
 	fileEntity, err := s.fileRepo.GetByID(ctx, req.FileID)
 	if err != nil {
 		return nil, fmt.Errorf("文件不存在: %w", err)
@@ -195,12 +187,13 @@ func (s *Service) GetDownloadURL(ctx context.Context, req *GetDownloadURLReq) (*
 		return nil, fmt.Errorf("无权限访问该文件")
 	}
 
-	// 生成下载URL
+	// 设置默认过期时间
 	expiresIn := req.ExpiresIn
 	if expiresIn <= 0 {
 		expiresIn = 3600 // 默认1小时
 	}
 
+	// 生成下载URL
 	downloadURL, err := s.storageRepo.GenerateDownloadURL(ctx, fileEntity.FileKey, expiresIn)
 	if err != nil {
 		return nil, fmt.Errorf("生成下载URL失败: %w", err)
@@ -222,156 +215,9 @@ func (s *Service) GetDownloadURL(ctx context.Context, req *GetDownloadURLReq) (*
 	}, nil
 }
 
-// GetFileInfo 获取文件信息
-func (s *Service) GetFileInfo(ctx context.Context, req *GetFileInfoReq) (*GetFileInfoResp, error) {
-	// 获取文件信息
-	fileEntity, err := s.fileRepo.GetByID(ctx, req.FileID)
-	if err != nil {
-		return nil, fmt.Errorf("文件不存在: %w", err)
-	}
-
-	// 检查访问权限
-	hasAccess, err := s.fileDomain.CheckFileAccess(fileEntity, req.UserID)
-	if err != nil {
-		return nil, fmt.Errorf("权限检查失败: %w", err)
-	}
-	if !hasAccess {
-		return nil, fmt.Errorf("无权限访问该文件")
-	}
-
-	// 生成临时下载URL（如果有权限）
-	var downloadURL string
-	if hasAccess {
-		downloadURL, _ = s.storageRepo.GenerateDownloadURL(ctx, fileEntity.FileKey, 3600)
-	}
-
-	return &GetFileInfoResp{
-		FileInfo: &FileInfoDTO{
-			FileID:      fileEntity.ID,
-			Filename:    fileEntity.Filename,
-			FileKey:     fileEntity.FileKey,
-			FileSize:    fileEntity.FileSize,
-			MimeType:    fileEntity.MimeType,
-			Category:    fileEntity.Category,
-			OwnerID:     fileEntity.OwnerID,
-			Visibility:  fileEntity.Visibility,
-			CreatedAt:   fileEntity.CreatedAt,
-			DownloadURL: downloadURL,
-		},
-	}, nil
-}
-
-// ListFiles 获取文件列表
-func (s *Service) ListFiles(ctx context.Context, req *ListFilesReq) (*ListFilesResp, error) {
-	// 获取文件列表
-	files, total, err := s.fileRepo.List(ctx, &file.ListFilesReq{
-		OwnerID:  req.UserID,
-		Category: req.Category,
-		Page:     req.Page,
-		PageSize: req.PageSize,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("获取文件列表失败: %w", err)
-	}
-
-	// 转换为DTO
-	fileDTOs := make([]*FileInfoDTO, 0, len(files))
-	for _, f := range files {
-		// 为每个文件生成临时下载URL
-		downloadURL, _ := s.storageRepo.GenerateDownloadURL(ctx, f.FileKey, 3600)
-
-		fileDTOs = append(fileDTOs, &FileInfoDTO{
-			FileID:      f.ID,
-			Filename:    f.Filename,
-			FileKey:     f.FileKey,
-			FileSize:    f.FileSize,
-			MimeType:    f.MimeType,
-			Category:    f.Category,
-			OwnerID:     f.OwnerID,
-			Visibility:  f.Visibility,
-			CreatedAt:   f.CreatedAt,
-			DownloadURL: downloadURL,
-		})
-	}
-
-	return &ListFilesResp{
-		Files:    fileDTOs,
-		Total:    total,
-		Page:     req.Page,
-		PageSize: req.PageSize,
-	}, nil
-}
-
-// DeleteFile 删除文件
-func (s *Service) DeleteFile(ctx context.Context, req *DeleteFileReq) error {
-	// 获取文件信息
-	fileEntity, err := s.fileRepo.GetByID(ctx, req.FileID)
-	if err != nil {
-		return fmt.Errorf("文件不存在: %w", err)
-	}
-
-	// 检查删除权限（只有所有者可以删除）
-	if fileEntity.OwnerID != req.UserID {
-		return fmt.Errorf("无权限删除该文件")
-	}
-
-	// 软删除文件记录
-	err = s.fileRepo.SoftDelete(ctx, req.FileID)
-	if err != nil {
-		return fmt.Errorf("删除文件记录失败: %w", err)
-	}
-
-	// 从存储系统删除文件
-	err = s.storageRepo.DeleteFile(ctx, fileEntity.FileKey)
-	if err != nil {
-		// 存储删除失败，记录日志但不回滚数据库操作
-		// 可以通过定时任务清理孤立文件
-	}
-
-	// 记录访问日志
-	_ = s.fileRepo.CreateAccessLog(ctx, &file.FileAccessLog{
-		FileID:     fileEntity.ID,
-		UserID:     &req.UserID,
-		Action:     "delete",
-		IPAddress:  "", // 从context获取
-		StatusCode: func() *int16 { code := int16(200); return &code }(),
-		AccessedAt: time.Now(),
-	})
-
-	return nil
-}
-
-// CheckFileAccess 检查文件访问权限
-func (s *Service) CheckFileAccess(ctx context.Context, req *CheckFileAccessReq) (*CheckFileAccessResp, error) {
-	// 获取文件信息
-	fileEntity, err := s.fileRepo.GetByID(ctx, req.FileID)
-	if err != nil {
-		return &CheckFileAccessResp{
-			HasAccess: false,
-			Reason:    "文件不存在",
-		}, nil
-	}
-
-	// 检查访问权限
-	hasAccess, err := s.fileDomain.CheckFileAccess(fileEntity, req.UserID)
-	if err != nil {
-		return &CheckFileAccessResp{
-			HasAccess: false,
-			Reason:    "权限检查失败",
-		}, nil
-	}
-
-	reason := ""
-	if !hasAccess {
-		if fileEntity.Visibility == "private" && fileEntity.OwnerID != req.UserID {
-			reason = "文件为私有，且非文件所有者"
-		} else if fileEntity.Status != 1 {
-			reason = "文件已被删除"
-		}
-	}
-
-	return &CheckFileAccessResp{
-		HasAccess: hasAccess,
-		Reason:    reason,
-	}, nil
+// generateFileKey 生成文件存储键
+func (s *Service) generateFileKey(userID, fileID, filename string) string {
+	ext := filepath.Ext(filename)
+	timestamp := time.Now().Format("20060102")
+	return fmt.Sprintf("uploads/%s/%s/%s%s", userID, timestamp, fileID, ext)
 }

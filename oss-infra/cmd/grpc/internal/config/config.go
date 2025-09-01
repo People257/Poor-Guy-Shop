@@ -1,37 +1,62 @@
 package config
 
 import (
-	"fmt"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
+	"github.com/people257/poor-guy-shop/common/db"
 	"github.com/people257/poor-guy-shop/common/server/config"
-
-	"github.com/spf13/viper"
 )
 
 type Config struct {
-	config.GrpcServerConfig `mapstructure:",squash"`
-	Database                DatabaseConfig `mapstructure:"database"`
-	Redis                   RedisConfig    `mapstructure:"redis"`
+	GrpcServerConfig config.GrpcServerConfig `mapstructure:",squash"`
+	Database         db.DatabaseConfig       `mapstructure:"database"`
+	Redis            db.RedisConfig          `mapstructure:"redis"`
+	Storage          StorageConfig           `mapstructure:"storage"`
+}
+
+type StorageConfig struct {
+	Provider string              `mapstructure:"provider"` // local, aws, aliyun
+	Local    LocalStorageConfig  `mapstructure:"local"`
+	AWS      AWSStorageConfig    `mapstructure:"aws"`
+	Aliyun   AliyunStorageConfig `mapstructure:"aliyun"`
+}
+
+type LocalStorageConfig struct {
+	UploadPath string `mapstructure:"upload_path"`
+	BaseURL    string `mapstructure:"base_url"`
+}
+
+type AWSStorageConfig struct {
+	Region          string `mapstructure:"region"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	SecretAccessKey string `mapstructure:"secret_access_key"`
+	Bucket          string `mapstructure:"bucket"`
+	Endpoint        string `mapstructure:"endpoint"`
+}
+
+type AliyunStorageConfig struct {
+	Region          string `mapstructure:"region"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	SecretAccessKey string `mapstructure:"secret_access_key"`
+	Bucket          string `mapstructure:"bucket"`
+	Endpoint        string `mapstructure:"endpoint"`
 }
 
 func MustLoad(path string) *Config {
-	v := viper.New()
-	v.SetConfigFile(path)
-
-	if err := v.ReadInConfig(); err != nil {
-		panic(fmt.Errorf("failed to read config file: %s", err))
-	}
-
-	var c Config
-	if err := v.Unmarshal(&c); err != nil {
-		panic(fmt.Errorf("failed to unmarshal config: %s", err))
-	}
-
-	// Validate environment type
-	if err := config.ValidateEnv(c.Server.Env); err != nil {
+	k := koanf.New(".")
+	if err := k.Load(file.Provider(path), yaml.Parser()); err != nil {
 		panic(err)
 	}
-
-	return &c
+	var cfg Config
+	unmarshalConfig := koanf.UnmarshalConf{
+		Tag:       "mapstructure",
+		FlatPaths: false,
+	}
+	if err := k.UnmarshalWithConf("", &cfg, unmarshalConfig); err != nil {
+		panic(err)
+	}
+	return &cfg
 }
 
 func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
