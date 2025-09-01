@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/people257/poor-guy-shop/user-service/internal/domain/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/domain/user"
@@ -247,4 +248,45 @@ func (s *Service) RefreshToken(ctx context.Context, req *RefreshTokenRequest) (*
 		AccessExpiresIn:  tokenPair.AccessExpiresIn,
 		RefreshExpiresIn: tokenPair.RefreshExpiresIn,
 	}, nil
+}
+
+// SendEmailOTPRequest 发送邮箱验证码请求
+type SendEmailOTPRequest struct {
+	Email   string
+	Purpose string
+}
+
+// SendEmailOTP 发送邮箱验证码（应用服务编排）
+func (s *Service) SendEmailOTP(ctx context.Context, req *SendEmailOTPRequest) error {
+	// 1. 验证邮箱格式（委托给用户领域服务）
+	if err := s.userDomainService.ValidateEmailFormat(req.Email); err != nil {
+		return err
+	}
+
+	// 2. 根据用途验证业务规则
+	switch req.Purpose {
+	case "register":
+		// 注册时检查邮箱是否已存在
+		exists, err := s.userRepo.ExistsByEmail(ctx, req.Email)
+		if err != nil {
+			return err
+		}
+		if exists {
+			return user.ErrEmailAlreadyExists
+		}
+	case "login", "password_reset", "change_email":
+		// 登录、密码重置、更换邮箱时检查邮箱是否存在
+		exists, err := s.userRepo.ExistsByEmail(ctx, req.Email)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return user.ErrUserNotFound
+		}
+	default:
+		return fmt.Errorf("不支持的验证码用途: %s", req.Purpose)
+	}
+
+	// 3. 发送验证码（委托给认证领域服务）
+	return s.authDomainService.SendEmailVerificationCode(ctx, req.Email, req.Purpose)
 }

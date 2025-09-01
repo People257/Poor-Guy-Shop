@@ -60,6 +60,14 @@ service AuthService {
     };
   }
 
+  // 发送邮箱验证码
+  rpc SendEmailOTP(SendEmailOTPReq) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/user/auth/email/otp/send"
+      body: "*"
+    };
+  }
+
   // 刷新令牌
   rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp) {
     option (google.api.http) = {
@@ -150,6 +158,13 @@ message ChangeEmailOTPReq {
   string email = 1;
   // 邮箱验证码
   string captcha = 2;
+}
+
+message SendEmailOTPReq {
+  // 邮箱地址
+  string email = 1 [(google.api.field_behavior) = REQUIRED];
+  // 验证码用途: register(注册), login(登录), password_reset(密码重置), change_email(更换邮箱)
+  string purpose = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message RefreshTokenReq {

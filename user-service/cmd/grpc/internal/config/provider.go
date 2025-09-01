@@ -17,5 +17,5 @@ func GetServerConfig(cfg *Config) *config.ServerConfig {
 	if cfg == nil {
 		panic("server config is nil")
 	}
-	return &cfg.Server
+	return &cfg.GrpcServerConfig.Server
 }

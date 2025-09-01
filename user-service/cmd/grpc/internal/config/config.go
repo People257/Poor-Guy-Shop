@@ -3,7 +3,9 @@ package config
 import (
 	"time"
 
-	"github.com/people257/poor-guy-shop/common/conf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 	"github.com/people257/poor-guy-shop/common/db"
 	"github.com/people257/poor-guy-shop/common/server/config"
 )
@@ -17,17 +19,28 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	config.GrpcServerConfig `mapstructure:",squash"`
-	Database                db.DatabaseConfig `mapstructure:"database"`
-	Redis                   db.RedisConfig    `mapstructure:"redis"`
-	JWT                     JWTConfig         `mapstructure:"jwt"`
-	Captcha                 CaptchaConfig     `mapstructure:"captcha"`
-	Email                   EmailConfig       `mapstructure:"email"`
+	GrpcServerConfig config.GrpcServerConfig `mapstructure:",squash"`
+	Database         db.DatabaseConfig       `mapstructure:"database"`
+	Redis            db.RedisConfig          `mapstructure:"redis"`
+	JWT              JWTConfig               `mapstructure:"jwt"`
+	Captcha          CaptchaConfig           `mapstructure:"captcha"`
+	Email            EmailConfig             `mapstructure:"email"`
 }
 
 func MustLoad(path string) *Config {
-	_, c := conf.MustLoad[Config](path)
-	return &c
+	k := koanf.New(".")
+	if err := k.Load(file.Provider(path), yaml.Parser()); err != nil {
+		panic(err)
+	}
+	var cfg Config
+	unmarshalConfig := koanf.UnmarshalConf{
+		Tag:       "mapstructure",
+		FlatPaths: false,
+	}
+	if err := k.UnmarshalWithConf("", &cfg, unmarshalConfig); err != nil {
+		panic(err)
+	}
+	return &cfg
 }
 
 func GetGrpcServerConfig(cfg *Config) *config.GrpcServerConfig {
@@ -67,10 +80,19 @@ func GetJWTConfig(cfg *Config) *JWTConfig {
 
 // CaptchaConfig 验证码配置
 type CaptchaConfig struct {
-	Provider       string `mapstructure:"provider"`        // Captcha 服务提供商
-	Secret         string `mapstructure:"secret"`          // Captcha 密钥
-	Endpoint       string `mapstructure:"endpoint"`        // Captcha 服务端点
-	ExpectedDomain string `mapstructure:"expected_domain"` // 预期的域名
+	Provider       string             `mapstructure:"provider"`        // Captcha 服务提供商
+	Secret         string             `mapstructure:"secret"`          // Captcha 密钥
+	Endpoint       string             `mapstructure:"endpoint"`        // Captcha 服务端点
+	ExpectedDomain string             `mapstructure:"expected_domain"` // 预期的域名
+	Email          EmailCaptchaConfig `mapstructure:"email"`           // 邮箱验证码配置
+}
+
+type EmailCaptchaConfig struct {
+	Enabled      bool `mapstructure:"enabled"`
+	CodeLength   int  `mapstructure:"code_length"`
+	ExpiresIn    int  `mapstructure:"expires_in"`
+	SendInterval int  `mapstructure:"send_interval"`
+	DailyLimit   int  `mapstructure:"daily_limit"`
 }
 
 func GetCaptchaConfig(cfg *Config) *CaptchaConfig {

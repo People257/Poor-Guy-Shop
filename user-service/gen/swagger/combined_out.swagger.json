@@ -189,6 +189,34 @@
         ]
       }
     },
+    "/v1/user/auth/email/otp/send": {
+      "post": {
+        "summary": "发送邮箱验证码",
+        "operationId": "AuthService_SendEmailOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authSendEmailOTPReq"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/v1/user/auth/refresh-token": {
       "post": {
         "summary": "刷新令牌",
@@ -461,6 +489,23 @@
           "title": "令牌有效期(秒)"
         }
       }
+    },
+    "authSendEmailOTPReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "邮箱地址"
+        },
+        "purpose": {
+          "type": "string",
+          "title": "验证码用途: register(注册), login(登录), password_reset(密码重置), change_email(更换邮箱)"
+        }
+      },
+      "required": [
+        "email",
+        "purpose"
+      ]
     },
     "authUpdateUserInfoRequest": {
       "type": "object",

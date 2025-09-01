@@ -136,6 +136,11 @@ func (s *DomainService) ResetUserPassword(ctx context.Context, email, newPasswor
 	return nil
 }
 
+// ValidateEmailFormat 验证邮箱格式
+func (s *DomainService) ValidateEmailFormat(email string) error {
+	return ValidateEmail(email)
+}
+
 // generateUsernameFromEmail 从邮箱生成用户名
 func (s *DomainService) generateUsernameFromEmail(email string) string {
 	// 取邮箱@前面的部分作为用户名

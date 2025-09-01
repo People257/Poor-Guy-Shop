@@ -1,16 +1,15 @@
 server:
   name: "user-service"  # 服务名称(注册到服务发现中心的名称)
   env: "dev"  # 环境,可选值: dev, test, prod
-  port: 8081  # 服务端口
+  port: 19091  # 服务端口
 
 database:
   master:
-    host: "127.0.0.1"
-    user: "postgres"
-    password: "root"
-    database: "test"
+    host: "47.99.147.94"
     port: 5432
-  replicas: []
+    database: "user-service"
+    user: "postgres"
+    password: "wdh961100"
 
 redis:
   host: "127.0.0.1"
@@ -19,28 +18,118 @@ redis:
   password: ""
 
 jwt:
-  secret: "your-secret-key-here-at-least-32-bytes-long-1234567890"
-  expire_duration: "24h"
+  secret: "user-service-access-secret-key-2024-minimum-32-bytes-required!"
+  expire_duration: "1h"
   refresh_threshold_duration: "48h"
 
-captcha:
-  provider: "cloudflare_turnstile"
-  secret: "your-captcha-secret-key"
-  endpoint: "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-  expected_domain: "example.com"
 
+# 邮件服务配置
 email:
   smtp:
-    host: "smtp.gmail.com"
-    port: 587
-    username: "your-email@gmail.com"
-    password: "your-password"
-    from: "your-email@gmail.com"
-    use_tls: true
+    host: "smtp.qq.com"    # SMTP服务器地址
+    port: 587                 # SMTP端口
+    username: "1930680773"              # 发送邮箱账户
+    password: "wdh961100"              # 邮箱密码或应用专用密码
+    from: "1930680773@qq.com"  # 发件人邮箱
+    use_tls: true            # 是否使用TLS
+  # 邮件模板配置
   templates:
-    verification:
-      subject: "Email Verification"
-      body: "Your verification code is: {{.Code}}"
+    # 用户注册验证码模板
+    register:
+      subject: "【用户服务】注册验证码"
+      body: |
+        欢迎注册用户服务！
+
+        您的注册验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        如果这不是您本人的操作，请忽略此邮件。
+
+        感谢您的注册！
+        用户服务团队
+
+    # 验证码登录模板
+    login:
+      subject: "【用户服务】登录验证码"
+      body: |
+        您好！
+
+        您正在使用验证码登录，验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        为了账户安全，请勿将验证码告诉他人。
+        如果这不是您本人的操作，请立即联系我们。
+
+        用户服务团队
+
+    # 密码重置验证码模板
+    password_reset:
+      subject: "【用户服务】密码重置验证码"
+      body: |
+        您好！
+
+        您请求重置密码，验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        重置密码后，请妥善保管新密码。
+        如果这不是您本人的操作，请立即联系我们。
+
+        用户服务团队
+
+    # 更换邮箱验证码模板
+    change_email:
+      subject: "【用户服务】邮箱更换验证码"
+      body: |
+        您好！
+
+        您正在更换绑定邮箱，验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        更换邮箱后，新邮箱将作为您的主要联系方式。
+        如果这不是您本人的操作，请立即联系我们。
+
+        用户服务团队
+
+    # 通用验证码邮件模板（向后兼容）
+    verification_code:
+      subject: "【用户服务】邮箱验证码"
+      body: |
+        您好！
+
+        您的邮箱验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        如果这不是您本人的操作，请忽略此邮件。
+
+        谢谢！
+        用户服务团队
+    # 注册成功邮件模板
+    registration_success:
+      subject: "【用户服务】注册成功"
+      body: |
+        您好 {{.Username}}！
+
+        恭喜您成功注册用户账户！
+
+        账户信息：
+        - 用户名：{{.Username}}
+        - 邮箱：{{.Email}}
+        - 注册时间：{{.CreatedAt}}
+
+        感谢您的使用！
+        用户服务团队
+    # 密码重置邮件模板
+    password_reset:
+      subject: "【用户服务】密码重置验证码"
+      body: |
+        您好！
+
+        您请求重置密码，验证码是：{{.Code}}
+
+        验证码有效期为5分钟，请及时使用。
+        如果这不是您本人的操作，请立即联系我们。
+
+        用户服务团队
 
 observability:
   port: 16665  # HTTP 可观测性相关端口
@@ -58,9 +147,9 @@ registry:
 log:
   level: "info"
   file:
-    enable: false
+    enable: true
     directory: "./logs"
-    name: "gateway.log"
+    name: "user-service.log"
     max_size: 100
     max_age: 30
     max_backups: 5

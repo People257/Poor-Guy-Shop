@@ -26,6 +26,7 @@ const (
 	AuthService_RetrievePassword_FullMethodName = "/ces.user.auth.AuthService/RetrievePassword"
 	AuthService_ChangeEmail_FullMethodName      = "/ces.user.auth.AuthService/ChangeEmail"
 	AuthService_ChangeEmailOTP_FullMethodName   = "/ces.user.auth.AuthService/ChangeEmailOTP"
+	AuthService_SendEmailOTP_FullMethodName     = "/ces.user.auth.AuthService/SendEmailOTP"
 	AuthService_RefreshToken_FullMethodName     = "/ces.user.auth.AuthService/RefreshToken"
 	AuthService_AuthenticateRPC_FullMethodName  = "/ces.user.auth.AuthService/AuthenticateRPC"
 )
@@ -47,6 +48,8 @@ type AuthServiceClient interface {
 	ChangeEmail(ctx context.Context, in *ChangeEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 用户换绑邮箱获取验证码
 	ChangeEmailOTP(ctx context.Context, in *ChangeEmailOTPReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 发送邮箱验证码
+	SendEmailOTP(ctx context.Context, in *SendEmailOTPReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 刷新令牌
 	RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
 	// ---------------------rpc--------------------
@@ -122,6 +125,16 @@ func (c *authServiceClient) ChangeEmailOTP(ctx context.Context, in *ChangeEmailO
 	return out, nil
 }
 
+func (c *authServiceClient) SendEmailOTP(ctx context.Context, in *SendEmailOTPReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AuthService_SendEmailOTP_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RefreshTokenResp)
@@ -159,6 +172,8 @@ type AuthServiceServer interface {
 	ChangeEmail(context.Context, *ChangeEmailReq) (*emptypb.Empty, error)
 	// 用户换绑邮箱获取验证码
 	ChangeEmailOTP(context.Context, *ChangeEmailOTPReq) (*emptypb.Empty, error)
+	// 发送邮箱验证码
+	SendEmailOTP(context.Context, *SendEmailOTPReq) (*emptypb.Empty, error)
 	// 刷新令牌
 	RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error)
 	// ---------------------rpc--------------------
@@ -190,6 +205,9 @@ func (UnimplementedAuthServiceServer) ChangeEmail(context.Context, *ChangeEmailR
 }
 func (UnimplementedAuthServiceServer) ChangeEmailOTP(context.Context, *ChangeEmailOTPReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeEmailOTP not implemented")
+}
+func (UnimplementedAuthServiceServer) SendEmailOTP(context.Context, *SendEmailOTPReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmailOTP not implemented")
 }
 func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
@@ -325,6 +343,24 @@ func _AuthService_ChangeEmailOTP_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_SendEmailOTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEmailOTPReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendEmailOTP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SendEmailOTP_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendEmailOTP(ctx, req.(*SendEmailOTPReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RefreshTokenReq)
 	if err := dec(in); err != nil {
@@ -391,6 +427,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChangeEmailOTP",
 			Handler:    _AuthService_ChangeEmailOTP_Handler,
+		},
+		{
+			MethodName: "SendEmailOTP",
+			Handler:    _AuthService_SendEmailOTP_Handler,
 		},
 		{
 			MethodName: "RefreshToken",

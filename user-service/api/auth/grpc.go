@@ -231,3 +231,37 @@ func (s *AuthServer) RefreshToken(ctx context.Context, req *authpb.RefreshTokenR
 		RefreshExpiresIn: resp.RefreshExpiresIn,
 	}, nil
 }
+
+// SendEmailOTP 发送邮箱验证码
+func (s *AuthServer) SendEmailOTP(ctx context.Context, req *authpb.SendEmailOTPReq) (*emptypb.Empty, error) {
+	// 验证请求参数
+	if req.Email == "" {
+		return nil, status.Error(codes.InvalidArgument, "邮箱不能为空")
+	}
+	if req.Purpose == "" {
+		return nil, status.Error(codes.InvalidArgument, "验证码用途不能为空")
+	}
+
+	// 验证用途是否有效
+	validPurposes := map[string]bool{
+		"register":       true,
+		"login":          true,
+		"password_reset": true,
+		"change_email":   true,
+	}
+	if !validPurposes[req.Purpose] {
+		return nil, status.Error(codes.InvalidArgument, "无效的验证码用途")
+	}
+
+	// 调用应用服务
+	sendReq := &auth.SendEmailOTPRequest{
+		Email:   req.Email,
+		Purpose: req.Purpose,
+	}
+
+	if err := s.authService.SendEmailOTP(ctx, sendReq); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &emptypb.Empty{}, nil
+}

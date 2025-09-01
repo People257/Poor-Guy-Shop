@@ -89,10 +89,7 @@ func (s *EmailCaptchaService) SendEmailOTP(ctx context.Context, email string, pu
 	s.redisClient.ExpireAt(ctx, dailyKey, midnight)
 
 	// 根据用途选择邮件模板
-	templateName := "verification_code"
-	if purpose == "password_reset" {
-		templateName = "password_reset"
-	}
+	templateName := getTemplateNameByPurpose(purpose)
 
 	// 发送邮件
 	err = s.emailService.SendTemplate(ctx, templateName, email, map[string]interface{}{
@@ -155,4 +152,21 @@ func (s *EmailCaptchaService) generateOTP() string {
 	rand.Seed(time.Now().UnixNano())
 	format := fmt.Sprintf("%%0%dd", codeLength)
 	return fmt.Sprintf(format, rand.Intn(max))
+}
+
+// getTemplateNameByPurpose 根据用途选择邮件模板
+func getTemplateNameByPurpose(purpose string) string {
+	switch purpose {
+	case "register":
+		return "register"
+	case "login":
+		return "login"
+	case "password_reset":
+		return "password_reset"
+	case "change_email":
+		return "change_email"
+	default:
+		// 默认使用通用验证码模板
+		return "verification_code"
+	}
 }

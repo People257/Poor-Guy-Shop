@@ -5,6 +5,18 @@ import (
 	internalConfig "github.com/people257/poor-guy-shop/user-service/internal/config"
 )
 
+// convertEmailTemplates 转换邮件模板映射
+func convertEmailTemplates(templates map[string]config.EmailTemplate) map[string]internalConfig.EmailTemplate {
+	result := make(map[string]internalConfig.EmailTemplate)
+	for key, template := range templates {
+		result[key] = internalConfig.EmailTemplate{
+			Subject: template.Subject,
+			Body:    template.Body,
+		}
+	}
+	return result
+}
+
 // ProvideInternalEmailConfig 转换邮件配置
 func ProvideInternalEmailConfig(cfg *config.Config) *internalConfig.EmailConfig {
 	return &internalConfig.EmailConfig{
@@ -16,7 +28,7 @@ func ProvideInternalEmailConfig(cfg *config.Config) *internalConfig.EmailConfig 
 			From:     cfg.Email.SMTP.From,
 			UseTLS:   cfg.Email.SMTP.UseTLS,
 		},
-		Templates: make(map[string]internalConfig.EmailTemplate),
+		Templates: convertEmailTemplates(cfg.Email.Templates),
 	}
 }
 
