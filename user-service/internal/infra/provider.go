@@ -12,6 +12,7 @@ import (
 var InfraProviderSet = wire.NewSet(
 	repository.NewUserRepository,
 	repository.NewRefreshTokenRepository,
+	repository.NewAddressRepository,
 	auth.NewTokenService,
 	auth.NewAuth,
 	email.NewSMTPService,

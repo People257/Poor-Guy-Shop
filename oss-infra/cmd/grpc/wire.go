@@ -5,11 +5,14 @@ package main
 
 import (
 	"context"
+
 	"github.com/google/wire"
+	"github.com/people257/poor-guy-shop/common/server"
 	"github.com/people257/poor-guy-shop/oss-infra/api"
 	"github.com/people257/poor-guy-shop/oss-infra/cmd/grpc/internal"
 	"github.com/people257/poor-guy-shop/oss-infra/cmd/grpc/internal/config"
 	"github.com/people257/poor-guy-shop/oss-infra/internal/application"
+	"github.com/people257/poor-guy-shop/oss-infra/internal/domain"
 	"github.com/people257/poor-guy-shop/oss-infra/internal/infra"
 )
 
@@ -19,10 +22,11 @@ func InitializeApplication(ctx context.Context, configPath string) (*Application
 		config.GetGrpcServerConfig,
 
 		config.ConfigProviderSet,
+		internal.InternalProviderSet,
+		domain.DomainServiceProviderSet,
+		infra.InfraProviderSet,
 		application.AppProviderSet,
 		api.HandlerProviderSet,
-		infra.InfraProviderSet,
-		internal.InternalProviderSet,
 
 		server.InitializeServer,
 

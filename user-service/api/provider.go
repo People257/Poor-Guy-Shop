@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/google/wire"
+	"github.com/people257/poor-guy-shop/user-service/api/address"
 	"github.com/people257/poor-guy-shop/user-service/api/auth"
 	"github.com/people257/poor-guy-shop/user-service/api/info"
 )
@@ -10,6 +11,7 @@ import (
 var APIProviderSet = wire.NewSet(
 	auth.NewAuthServer,
 	info.NewInfoServer,
+	address.NewAddressServer,
 )
 
 // HandlerProviderSet Handler providers

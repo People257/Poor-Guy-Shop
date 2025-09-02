@@ -2,7 +2,9 @@ package internal
 
 import (
 	"fmt"
-	"github.com/people257/poor-guy-shop/oss-infra/cmd/grpc/internal/config"
+
+	"github.com/people257/poor-guy-shop/common/db"
+	"github.com/people257/poor-guy-shop/oss-infra/gen/gen/query"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel"
@@ -15,7 +17,7 @@ import (
 
 const postgresTcpDSN = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai"
 
-func NewDB(cfg *config.DatabaseConfig) *db.DB[*query.Query] {
+func NewDB(cfg *db.DatabaseConfig) *db.DB[*query.Query] {
 	logger := zapgorm2.New(zap.L())
 	logger.IgnoreRecordNotFoundError = true
 
@@ -38,7 +40,7 @@ func NewDB(cfg *config.DatabaseConfig) *db.DB[*query.Query] {
 	return db.New(query.Use(database))
 }
 
-func NewRedisClient(cfg *config.RedisConfig) redis.UniversalClient {
+func NewRedisClient(cfg *db.RedisConfig) redis.UniversalClient {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Username: cfg.User,

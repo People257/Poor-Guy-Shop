@@ -113,7 +113,16 @@ func (s *Service) UploadFile(ctx context.Context, req *UploadFileReq) (*UploadFi
 	}
 
 	// 上传到存储系统
-	err = s.storageRepo.UploadFile(ctx, fileKey, req.FileData)
+	err = s.storageRepo.SaveFile(ctx, &file.SaveFileReq{
+		FileKey:  fileKey,
+		FileData: req.FileData,
+		MimeType: mimeType,
+		Metadata: map[string]string{
+			"category":   req.Category,
+			"visibility": req.Visibility,
+			"owner_id":   req.UserID,
+		},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("文件上传失败: %w", err)
 	}

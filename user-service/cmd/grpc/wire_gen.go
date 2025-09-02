@@ -10,12 +10,15 @@ import (
 	"context"
 	"github.com/people257/poor-guy-shop/common/db"
 	"github.com/people257/poor-guy-shop/common/server"
+	address3 "github.com/people257/poor-guy-shop/user-service/api/address"
 	auth4 "github.com/people257/poor-guy-shop/user-service/api/auth"
 	info2 "github.com/people257/poor-guy-shop/user-service/api/info"
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal"
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
+	address2 "github.com/people257/poor-guy-shop/user-service/internal/application/address"
 	auth3 "github.com/people257/poor-guy-shop/user-service/internal/application/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/application/info"
+	"github.com/people257/poor-guy-shop/user-service/internal/domain/address"
 	auth2 "github.com/people257/poor-guy-shop/user-service/internal/domain/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/domain/user"
 	"github.com/people257/poor-guy-shop/user-service/internal/infra"
@@ -55,7 +58,11 @@ func InitializeApplication(ctx context.Context, configPath2 string) (*Applicatio
 	authServer := auth4.NewAuthServer(authService, authAuth)
 	infoService := info.NewService(userRepository)
 	infoServer := info2.NewInfoServer(infoService, authAuth)
-	application := NewApplication(configConfig, serverServer, authServer, infoServer)
+	addressRepository := repository.NewAddressRepository(gormDB)
+	addressDomainService := address.NewDomainService(addressRepository)
+	addressService := address2.NewService(addressDomainService, addressRepository)
+	addressServer := address3.NewAddressServer(addressService, authAuth)
+	application := NewApplication(configConfig, serverServer, authServer, infoServer, addressServer)
 	return application, func() {
 		cleanup()
 	}

@@ -6,6 +6,9 @@
   },
   "tags": [
     {
+      "name": "AddressService"
+    },
+    {
       "name": "AuthService"
     },
     {
@@ -23,6 +26,171 @@
     "application/json"
   ],
   "paths": {
+    "/v1/user/addresses": {
+      "get": {
+        "summary": "获取地址列表",
+        "operationId": "AddressService_GetAddresses",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/addressGetAddressesResp"
+            }
+          }
+        },
+        "tags": [
+          "AddressService"
+        ]
+      },
+      "post": {
+        "summary": "添加地址",
+        "operationId": "AddressService_AddAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/addressAddressResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addressAddAddressReq"
+            }
+          }
+        ],
+        "tags": [
+          "AddressService"
+        ]
+      }
+    },
+    "/v1/user/addresses/{address_id}": {
+      "get": {
+        "summary": "获取地址详情",
+        "operationId": "AddressService_GetAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/addressAddressResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AddressService"
+        ]
+      },
+      "delete": {
+        "summary": "删除地址",
+        "operationId": "AddressService_DeleteAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AddressService"
+        ]
+      },
+      "put": {
+        "summary": "更新地址",
+        "operationId": "AddressService_UpdateAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/addressAddressResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddressServiceUpdateAddressBody"
+            }
+          }
+        ],
+        "tags": [
+          "AddressService"
+        ]
+      }
+    },
+    "/v1/user/addresses/default": {
+      "get": {
+        "summary": "获取默认地址",
+        "operationId": "AddressService_GetDefaultAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/addressAddressResp"
+            }
+          }
+        },
+        "tags": [
+          "AddressService"
+        ]
+      }
+    },
+    "/v1/user/addresses/{address_id}/default": {
+      "put": {
+        "summary": "设置默认地址",
+        "operationId": "AddressService_SetDefaultAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AddressService"
+        ]
+      }
+    },
     "/v1/user/auth/login": {
       "post": {
         "summary": "---------------------api--------------------\n用户登录",
@@ -288,6 +456,159 @@
     }
   },
   "definitions": {
+    "AddressServiceUpdateAddressBody": {
+      "type": "object",
+      "properties": {
+        "receiver_name": {
+          "type": "string"
+        },
+        "receiver_phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "address_label": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        }
+      },
+      "title": "更新地址请求"
+    },
+    "addressAddAddressReq": {
+      "type": "object",
+      "properties": {
+        "receiver_name": {
+          "type": "string"
+        },
+        "receiver_phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "address_label": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        }
+      },
+      "title": "添加地址请求"
+    },
+    "addressAddress": {
+      "type": "object",
+      "properties": {
+        "address_id": {
+          "type": "string"
+        },
+        "receiver_name": {
+          "type": "string"
+        },
+        "receiver_phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "address_label": {
+          "type": "string"
+        },
+        "is_default": {
+          "type": "boolean"
+        },
+        "longitude": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "latitude": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "full_address": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "地址信息"
+    },
+    "addressAddressResp": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/addressAddress"
+        }
+      },
+      "title": "地址响应"
+    },
+    "addressGetAddressesResp": {
+      "type": "object",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/addressAddress"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "地址列表响应"
+    },
     "authAuthenticateRPCResp": {
       "type": "object",
       "properties": {

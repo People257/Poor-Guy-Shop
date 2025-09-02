@@ -16,6 +16,7 @@ require (
 	github.com/people257/poor-guy-shop/common/gateway v0.0.0-20250805161543-d606e53d9e9b
 	github.com/people257/poor-guy-shop/common/server v0.0.0-20250805161543-d606e53d9e9b
 	github.com/redis/go-redis/v9 v9.12.1
+	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -95,7 +96,6 @@ require (
 	github.com/redis/go-redis/extra/redisotel/v9 v9.12.1 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect

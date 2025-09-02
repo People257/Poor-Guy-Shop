@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/people257/poor-guy-shop/common/server"
+	"github.com/people257/poor-guy-shop/user-service/api/address"
 	"github.com/people257/poor-guy-shop/user-service/api/auth"
 	"github.com/people257/poor-guy-shop/user-service/api/info"
 	"github.com/people257/poor-guy-shop/user-service/cmd/grpc/internal/config"
+	addresspb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/address"
 	authpb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/auth"
 	infopb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/info"
 	"google.golang.org/grpc"
@@ -21,6 +23,7 @@ func NewApplication(
 	s *server.Server,
 	authServer *auth.AuthServer,
 	infoServer *info.InfoServer,
+	addressServer *address.AddressServer,
 
 ) *Application {
 
@@ -28,6 +31,7 @@ func NewApplication(
 		// 注册gRPC服务
 		authpb.RegisterAuthServiceServer(s, authServer)
 		infopb.RegisterInfoServiceServer(s, infoServer)
+		addresspb.RegisterAddressServiceServer(s, addressServer)
 	})
 
 	return &Application{

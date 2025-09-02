@@ -33,19 +33,14 @@ type Config struct {
 }
 
 // NewStorageRepository 根据配置创建存储仓储
-func NewStorageRepository(cfg *Config) (file.StorageRepository, error) {
-	switch cfg.Type {
-	case StorageTypeS3:
-		// TODO: 实现S3存储
-		return nil, fmt.Errorf("S3存储暂未实现")
-	case StorageTypeOSS:
-		// TODO: 实现阿里云OSS存储
-		return nil, fmt.Errorf("阿里云OSS存储暂未实现")
-	case StorageTypeCOS:
-		// TODO: 实现腾讯云COS存储
-		return nil, fmt.Errorf("腾讯云COS存储暂未实现")
+func NewStorageRepository(cfg *config.StorageConfig) (file.StorageRepository, error) {
+	switch cfg.Provider {
+	case "aliyun":
+		return NewAliyunOSSStorage(&cfg.Aliyun)
+	case "qiniu":
+		return NewQiniuKodoStorage(&cfg.Qiniu)
 	default:
-		return nil, fmt.Errorf("不支持的存储类型: %s", cfg.Type)
+		return nil, fmt.Errorf("不支持的存储类型: %s", cfg.Provider)
 	}
 }
 

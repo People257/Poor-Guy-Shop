@@ -21,6 +21,7 @@ var (
 	Role             *role
 	RolePermission   *rolePermission
 	User             *user
+	UserAddress      *userAddress
 	UserLoginLog     *userLoginLog
 	UserOauthBinding *userOauthBinding
 	UserRole         *userRole
@@ -32,6 +33,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Role = &Q.Role
 	RolePermission = &Q.RolePermission
 	User = &Q.User
+	UserAddress = &Q.UserAddress
 	UserLoginLog = &Q.UserLoginLog
 	UserOauthBinding = &Q.UserOauthBinding
 	UserRole = &Q.UserRole
@@ -44,6 +46,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Role:             newRole(db, opts...),
 		RolePermission:   newRolePermission(db, opts...),
 		User:             newUser(db, opts...),
+		UserAddress:      newUserAddress(db, opts...),
 		UserLoginLog:     newUserLoginLog(db, opts...),
 		UserOauthBinding: newUserOauthBinding(db, opts...),
 		UserRole:         newUserRole(db, opts...),
@@ -57,6 +60,7 @@ type Query struct {
 	Role             role
 	RolePermission   rolePermission
 	User             user
+	UserAddress      userAddress
 	UserLoginLog     userLoginLog
 	UserOauthBinding userOauthBinding
 	UserRole         userRole
@@ -71,6 +75,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Role:             q.Role.clone(db),
 		RolePermission:   q.RolePermission.clone(db),
 		User:             q.User.clone(db),
+		UserAddress:      q.UserAddress.clone(db),
 		UserLoginLog:     q.UserLoginLog.clone(db),
 		UserOauthBinding: q.UserOauthBinding.clone(db),
 		UserRole:         q.UserRole.clone(db),
@@ -92,6 +97,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Role:             q.Role.replaceDB(db),
 		RolePermission:   q.RolePermission.replaceDB(db),
 		User:             q.User.replaceDB(db),
+		UserAddress:      q.UserAddress.replaceDB(db),
 		UserLoginLog:     q.UserLoginLog.replaceDB(db),
 		UserOauthBinding: q.UserOauthBinding.replaceDB(db),
 		UserRole:         q.UserRole.replaceDB(db),
@@ -103,6 +109,7 @@ type queryCtx struct {
 	Role             IRoleDo
 	RolePermission   IRolePermissionDo
 	User             IUserDo
+	UserAddress      IUserAddressDo
 	UserLoginLog     IUserLoginLogDo
 	UserOauthBinding IUserOauthBindingDo
 	UserRole         IUserRoleDo
@@ -114,6 +121,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Role:             q.Role.WithContext(ctx),
 		RolePermission:   q.RolePermission.WithContext(ctx),
 		User:             q.User.WithContext(ctx),
+		UserAddress:      q.UserAddress.WithContext(ctx),
 		UserLoginLog:     q.UserLoginLog.WithContext(ctx),
 		UserOauthBinding: q.UserOauthBinding.WithContext(ctx),
 		UserRole:         q.UserRole.WithContext(ctx),

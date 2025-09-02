@@ -14,7 +14,7 @@ import (
 
 // DomainService 文件领域服务
 type DomainService struct {
-	maxFileSize      int64  // 最大文件大小（字节）
+	maxFileSize      int64 // 最大文件大小（字节）
 	allowedMimeTypes map[string]bool
 	storagePrefix    string
 }
@@ -25,7 +25,7 @@ func NewDomainService(maxFileSize int64, allowedMimeTypes []string, storagePrefi
 	for _, mt := range allowedMimeTypes {
 		mimeTypeMap[mt] = true
 	}
-	
+
 	return &DomainService{
 		maxFileSize:      maxFileSize,
 		allowedMimeTypes: mimeTypeMap,
@@ -48,28 +48,28 @@ func (s *DomainService) CreateFile(req *CreateFileReq) (*File, error) {
 	if err := s.validateCreateFileReq(req); err != nil {
 		return nil, err
 	}
-	
+
 	// 生成文件哈希
 	fileHash := s.generateFileHash(req.FileData)
-	
+
 	// 检测MIME类型
 	mimeType := s.detectMimeType(req.Filename, req.FileData)
 	if !s.isAllowedMimeType(mimeType) {
 		return nil, ErrUnsupportedFileType
 	}
-	
+
 	// 生成文件键
 	fileKey := s.generateFileKey(req.Filename, req.Category, req.OwnerID)
-	
+
 	// 生成文件路径
 	filePath := s.generateFilePath(fileKey)
-	
+
 	// 设置默认可见性
 	visibility := req.Visibility
 	if visibility == "" {
 		visibility = "private"
 	}
-	
+
 	// 创建文件实体
 	file := NewFile(
 		req.Filename,
@@ -82,12 +82,12 @@ func (s *DomainService) CreateFile(req *CreateFileReq) (*File, error) {
 		req.OwnerID,
 		visibility,
 	)
-	
+
 	// 验证文件实体
 	if err := file.Validate(); err != nil {
 		return nil, err
 	}
-	
+
 	return file, nil
 }
 
@@ -96,12 +96,12 @@ func (s *DomainService) CheckFileAccess(file *File, userID string) (bool, error)
 	if file == nil {
 		return false, ErrFileNotFound
 	}
-	
+
 	// 检查文件是否已删除
 	if !file.IsActive() {
 		return false, ErrFileDeleted
 	}
-	
+
 	// 公开文件或文件所有者可以访问
 	return file.CanAccess(userID), nil
 }
@@ -142,30 +142,30 @@ func (s *DomainService) validateCreateFileReq(req *CreateFileReq) error {
 	if req.FileData == nil || len(req.FileData) == 0 {
 		return ErrInvalidFileSize
 	}
-	
+
 	if req.Filename == "" {
 		return ErrInvalidFilename
 	}
-	
+
 	if req.OwnerID == "" {
 		return ErrInvalidOwnerID
 	}
-	
+
 	// 验证文件大小
 	if err := s.ValidateFileSize(int64(len(req.FileData))); err != nil {
 		return err
 	}
-	
+
 	// 验证可见性设置
 	if req.Visibility != "" && req.Visibility != "public" && req.Visibility != "private" {
 		return ErrInvalidVisibility
 	}
-	
+
 	// 验证文件分类
 	if req.Category != "" && !isValidCategory(req.Category) {
 		return ErrInvalidCategory
 	}
-	
+
 	return nil
 }
 
@@ -182,12 +182,12 @@ func (s *DomainService) detectMimeType(filename string, data []byte) string {
 	if mimeType := mime.TypeByExtension(ext); mimeType != "" {
 		return mimeType
 	}
-	
+
 	// 根据文件头检测常见类型
 	if len(data) >= 512 {
 		return detectMimeTypeByHeader(data[:512])
 	}
-	
+
 	// 默认返回二进制类型
 	return "application/octet-stream"
 }
@@ -197,21 +197,21 @@ func detectMimeTypeByHeader(data []byte) string {
 	if len(data) < 4 {
 		return "application/octet-stream"
 	}
-	
+
 	// 常见文件头签名检测
 	signatures := map[string]string{
 		"\xFF\xD8\xFF":                     "image/jpeg",
-		"\x89PNG\r\n\x1A\n":               "image/png",
-		"GIF87a":                          "image/gif",
-		"GIF89a":                          "image/gif",
-		"RIFF":                            "image/webp", // 需要进一步检查
-		"\x00\x00\x00\x20ftypmp41":       "video/mp4",
-		"\x00\x00\x00\x1CftypM4V":        "video/mp4",
-		"%PDF":                            "application/pdf",
+		"\x89PNG\r\n\x1A\n":                "image/png",
+		"GIF87a":                           "image/gif",
+		"GIF89a":                           "image/gif",
+		"RIFF":                             "image/webp", // 需要进一步检查
+		"\x00\x00\x00\x20ftypmp41":         "video/mp4",
+		"\x00\x00\x00\x1CftypM4V":          "video/mp4",
+		"%PDF":                             "application/pdf",
 		"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1": "application/msword",
-		"PK\x03\x04":                      "application/zip", // 也可能是docx/xlsx等
+		"PK\x03\x04":                       "application/zip", // 也可能是docx/xlsx等
 	}
-	
+
 	dataStr := string(data)
 	for sig, mimeType := range signatures {
 		if strings.HasPrefix(dataStr, sig) {
@@ -222,7 +222,7 @@ func detectMimeTypeByHeader(data []byte) string {
 			return mimeType
 		}
 	}
-	
+
 	return "application/octet-stream"
 }
 
@@ -232,7 +232,7 @@ func (s *DomainService) isAllowedMimeType(mimeType string) bool {
 	if len(s.allowedMimeTypes) == 0 {
 		return true
 	}
-	
+
 	return s.allowedMimeTypes[mimeType]
 }
 
@@ -240,37 +240,37 @@ func (s *DomainService) isAllowedMimeType(mimeType string) bool {
 func (s *DomainService) generateFileKey(filename, category, ownerID string) string {
 	// 生成UUID作为唯一标识
 	fileID := uuid.New().String()
-	
+
 	// 获取文件扩展名
 	ext := filepath.Ext(filename)
-	
+
 	// 构建路径: prefix/category/year/month/day/uuid.ext
 	now := time.Now()
 	year := now.Format("2006")
 	month := now.Format("01")
 	day := now.Format("02")
-	
+
 	var pathParts []string
-	
+
 	// 添加存储前缀
 	if s.storagePrefix != "" {
 		pathParts = append(pathParts, s.storagePrefix)
 	}
-	
+
 	// 添加分类
 	if category != "" {
 		pathParts = append(pathParts, category)
 	} else {
 		pathParts = append(pathParts, "general")
 	}
-	
+
 	// 添加日期路径
 	pathParts = append(pathParts, year, month, day)
-	
+
 	// 添加文件名
 	fileName := fileID + ext
 	pathParts = append(pathParts, fileName)
-	
+
 	return strings.Join(pathParts, "/")
 }
 
@@ -291,7 +291,7 @@ func GetDefaultAllowedMimeTypes() []string {
 		"image/gif",
 		"image/webp",
 		"image/svg+xml",
-		
+
 		// 视频
 		"video/mp4",
 		"video/avi",
@@ -299,13 +299,13 @@ func GetDefaultAllowedMimeTypes() []string {
 		"video/wmv",
 		"video/flv",
 		"video/webm",
-		
+
 		// 音频
 		"audio/mpeg",
 		"audio/wav",
 		"audio/ogg",
 		"audio/mp3",
-		
+
 		// 文档
 		"application/pdf",
 		"application/msword",
@@ -316,13 +316,13 @@ func GetDefaultAllowedMimeTypes() []string {
 		"application/vnd.openxmlformats-officedocument.presentationml.presentation",
 		"text/plain",
 		"text/csv",
-		
+
 		// 压缩文件
 		"application/zip",
 		"application/x-rar-compressed",
 		"application/x-7z-compressed",
 		"application/gzip",
-		
+
 		// 其他
 		"application/json",
 		"application/xml",

@@ -16,23 +16,9 @@ type Config struct {
 }
 
 type StorageConfig struct {
-	Provider string              `mapstructure:"provider"` // local, aws, aliyun
-	Local    LocalStorageConfig  `mapstructure:"local"`
-	AWS      AWSStorageConfig    `mapstructure:"aws"`
+	Provider string              `mapstructure:"provider"` // aliyun, qiniu
 	Aliyun   AliyunStorageConfig `mapstructure:"aliyun"`
-}
-
-type LocalStorageConfig struct {
-	UploadPath string `mapstructure:"upload_path"`
-	BaseURL    string `mapstructure:"base_url"`
-}
-
-type AWSStorageConfig struct {
-	Region          string `mapstructure:"region"`
-	AccessKeyID     string `mapstructure:"access_key_id"`
-	SecretAccessKey string `mapstructure:"secret_access_key"`
-	Bucket          string `mapstructure:"bucket"`
-	Endpoint        string `mapstructure:"endpoint"`
+	Qiniu    QiniuStorageConfig  `mapstructure:"qiniu"`
 }
 
 type AliyunStorageConfig struct {
@@ -41,6 +27,14 @@ type AliyunStorageConfig struct {
 	SecretAccessKey string `mapstructure:"secret_access_key"`
 	Bucket          string `mapstructure:"bucket"`
 	Endpoint        string `mapstructure:"endpoint"`
+}
+
+type QiniuStorageConfig struct {
+	AccessKey string `mapstructure:"access_key"`
+	SecretKey string `mapstructure:"secret_key"`
+	Bucket    string `mapstructure:"bucket"`
+	Domain    string `mapstructure:"domain"` // 自定义域名或默认域名
+	Zone      string `mapstructure:"zone"`   // 存储区域
 }
 
 func MustLoad(path string) *Config {

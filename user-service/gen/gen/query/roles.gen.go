@@ -7,7 +7,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	"github.com/people257/poor-guy-shop/user-service/gen/gen/model"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -17,6 +16,8 @@ import (
 	"gorm.io/gen/field"
 
 	"gorm.io/plugin/dbresolver"
+
+	"github.com/people257/poor-guy-shop/user-service/gen/gen/model"
 )
 
 func newRole(db *gorm.DB, opts ...gen.DOOption) role {

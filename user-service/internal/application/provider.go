@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/google/wire"
+	"github.com/people257/poor-guy-shop/user-service/internal/application/address"
 	"github.com/people257/poor-guy-shop/user-service/internal/application/auth"
 	"github.com/people257/poor-guy-shop/user-service/internal/application/info"
 )
@@ -10,4 +11,5 @@ import (
 var AppProviderSet = wire.NewSet(
 	auth.NewService,
 	info.NewService,
+	address.NewService,
 )
