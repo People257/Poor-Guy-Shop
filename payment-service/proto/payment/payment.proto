@@ -201,3 +201,4 @@ message VerifyPaymentStatusResp {
   string payment_id = 2;                  // 支付订单ID
   string amount = 3;                      // 支付金额
 }
+

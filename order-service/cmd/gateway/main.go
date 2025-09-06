@@ -50,3 +50,4 @@ func main() {
 		log.Fatalf("Failed to start gateway server: %v", err)
 	}
 }
+

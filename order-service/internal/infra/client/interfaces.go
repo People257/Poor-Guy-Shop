@@ -47,3 +47,4 @@ type PaymentServiceInterface interface {
 	CreatePayment(ctx context.Context, req *PaymentRequest) (*PaymentResponse, error)
 	VerifyPayment(ctx context.Context, orderID string) (bool, error)
 }
+

@@ -30,3 +30,4 @@ func GetAlipayConfig(cfg *Config) *payment.AlipayConfig {
 func GetServicesConfig(cfg *Config) *ServicesConfig {
 	return &cfg.Services
 }
+

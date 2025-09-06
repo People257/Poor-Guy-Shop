@@ -67,3 +67,4 @@ func (c *UserServiceClient) AuthenticateUser(ctx context.Context, token string) 
 func (c *UserServiceClient) Close() error {
 	return c.conn.Close()
 }
+

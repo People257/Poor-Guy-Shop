@@ -127,3 +127,4 @@ func (m *Manager) checkInventoryService(ctx context.Context) bool {
 	_, err := m.InventoryClient.ReleaseInventory(ctx, "health-check")
 	return err == nil
 }
+

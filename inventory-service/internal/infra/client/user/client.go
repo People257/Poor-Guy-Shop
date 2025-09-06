@@ -89,3 +89,4 @@ func (c *GrpcClient) GetUserPermissions(ctx context.Context, userID uuid.UUID) (
 	// 这里需要根据实际的用户服务proto定义来实现
 	return []string{"inventory:read", "inventory:write"}, nil
 }
+

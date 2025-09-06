@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/labstack/echo/v4"
 	"github.com/people257/poor-guy-shop/common/gateway/config"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
-	"net/http"
 )
 
 type Gateway struct {

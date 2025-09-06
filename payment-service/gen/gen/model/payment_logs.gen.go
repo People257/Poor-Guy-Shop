@@ -27,3 +27,4 @@ type PaymentLog struct {
 func (*PaymentLog) TableName() string {
 	return TableNamePaymentLog
 }
+

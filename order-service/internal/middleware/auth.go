@@ -137,3 +137,4 @@ func GetUserIDFromContext(ctx context.Context) (string, bool) {
 	userID, ok := ctx.Value("user_id").(string)
 	return userID, ok
 }
+

@@ -165,3 +165,4 @@ func (h *EventHandler) CleanupExpiredReservations(ctx context.Context) error {
 	// 这个方法可以被定时任务调用
 	return nil
 }
+

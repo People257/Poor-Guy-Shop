@@ -239,3 +239,4 @@ message CheckInventoryAvailabilityResp {
   bool available = 1;                   // 库存是否充足
   repeated string insufficient_skus = 2; // 库存不足的SKU列表
 }
+

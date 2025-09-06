@@ -39,3 +39,4 @@ type PaymentOrder struct {
 func (*PaymentOrder) TableName() string {
 	return TableNamePaymentOrder
 }
+

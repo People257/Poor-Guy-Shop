@@ -36,3 +36,4 @@ func NewClientError(service, op string, err error) *ClientError {
 		Err:     err,
 	}
 }
+

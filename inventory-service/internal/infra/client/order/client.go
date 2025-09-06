@@ -73,3 +73,4 @@ func (c *GrpcClient) NotifyInventoryConfirmed(ctx context.Context, orderID strin
 	// 这里需要根据实际的订单服务proto定义来实现
 	return nil
 }
+

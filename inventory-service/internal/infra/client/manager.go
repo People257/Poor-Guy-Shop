@@ -118,3 +118,4 @@ func (m *Manager) HealthCheck(ctx context.Context) map[string]error {
 
 	return results
 }
+

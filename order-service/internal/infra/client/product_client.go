@@ -138,3 +138,4 @@ func (c *ProductServiceClient) CheckStock(ctx context.Context, skuID string, qua
 func (c *ProductServiceClient) Close() error {
 	return c.conn.Close()
 }
+

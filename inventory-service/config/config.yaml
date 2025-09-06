@@ -37,3 +37,4 @@ services:
   order_service:
     host: localhost
     port: 9002
+

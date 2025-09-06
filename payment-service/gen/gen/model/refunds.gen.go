@@ -33,3 +33,4 @@ type Refund struct {
 func (*Refund) TableName() string {
 	return TableNameRefund
 }
+

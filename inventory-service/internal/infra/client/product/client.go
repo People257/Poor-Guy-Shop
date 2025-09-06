@@ -105,3 +105,4 @@ func (c *GrpcClient) ValidateProducts(ctx context.Context, skuIDs []uuid.UUID) (
 	}
 	return result, nil
 }
+
