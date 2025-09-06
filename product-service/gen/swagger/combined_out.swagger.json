@@ -1,0 +1,1732 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "商品服务API",
+    "description": "商品管理服务的API接口",
+    "version": "1.0",
+    "contact": {
+      "name": "Poor Guy Shop",
+      "url": "https://github.com/people257/poor-guy-shop"
+    }
+  },
+  "tags": [
+    {
+      "name": "BrandService"
+    },
+    {
+      "name": "CategoryService"
+    },
+    {
+      "name": "ProductService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/brands": {
+      "get": {
+        "summary": "获取品牌列表",
+        "description": "获取品牌列表，支持分页和筛选",
+        "operationId": "BrandService_ListBrands",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/brandListBrandsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BrandService"
+        ]
+      },
+      "post": {
+        "summary": "创建品牌",
+        "description": "创建新的商品品牌",
+        "operationId": "BrandService_CreateBrand",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/brandCreateBrandResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/brandCreateBrandReq"
+            }
+          }
+        ],
+        "tags": [
+          "BrandService"
+        ]
+      }
+    },
+    "/api/v1/brands/{id}": {
+      "get": {
+        "summary": "获取品牌详情",
+        "description": "根据ID获取品牌详情",
+        "operationId": "BrandService_GetBrand",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/brandGetBrandResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BrandService"
+        ]
+      },
+      "delete": {
+        "summary": "删除品牌",
+        "description": "删除品牌",
+        "operationId": "BrandService_DeleteBrand",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/brandDeleteBrandResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BrandService"
+        ]
+      },
+      "put": {
+        "summary": "更新品牌",
+        "description": "更新品牌信息",
+        "operationId": "BrandService_UpdateBrand",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/brandUpdateBrandResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BrandServiceUpdateBrandBody"
+            }
+          }
+        ],
+        "tags": [
+          "BrandService"
+        ]
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "summary": "获取分类列表",
+        "description": "获取分类列表，支持分页和筛选",
+        "operationId": "CategoryService_ListCategories",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryListCategoriesResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      },
+      "post": {
+        "summary": "创建分类",
+        "description": "创建新的商品分类",
+        "operationId": "CategoryService_CreateCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryCreateCategoryResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/categoryCreateCategoryReq"
+            }
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
+    "/api/v1/categories/{id}": {
+      "get": {
+        "summary": "获取分类详情",
+        "description": "根据ID获取分类详情",
+        "operationId": "CategoryService_GetCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryGetCategoryResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      },
+      "delete": {
+        "summary": "删除分类",
+        "description": "删除商品分类",
+        "operationId": "CategoryService_DeleteCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryDeleteCategoryResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      },
+      "put": {
+        "summary": "更新分类",
+        "description": "更新商品分类信息",
+        "operationId": "CategoryService_UpdateCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryUpdateCategoryResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CategoryServiceUpdateCategoryBody"
+            }
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
+    "/api/v1/categories/tree": {
+      "get": {
+        "summary": "获取分类树",
+        "description": "获取完整的分类树结构",
+        "operationId": "CategoryService_GetCategoryTree",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/categoryGetCategoryTreeResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "active_only",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "summary": "获取商品列表",
+        "description": "获取商品列表，支持分页和筛选",
+        "operationId": "ProductService_ListProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productListProductsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "brand_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": " - 1: 草稿\n - 2: 上架\n - 3: 下架\n - 4: 已删除",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "default": 0
+          },
+          {
+            "name": "is_featured",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "price_min",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "price_max",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by",
+            "description": "created_at, price, name, sort_order",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_order",
+            "description": "asc, desc",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "post": {
+        "summary": "创建商品",
+        "description": "创建新的商品",
+        "operationId": "ProductService_CreateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productCreateProductResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/productCreateProductReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/api/v1/products/{id}": {
+      "get": {
+        "summary": "获取商品详情",
+        "description": "根据ID获取商品详情",
+        "operationId": "ProductService_GetProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productGetProductResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "delete": {
+        "summary": "删除商品",
+        "description": "删除商品",
+        "operationId": "ProductService_DeleteProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productDeleteProductResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "put": {
+        "summary": "更新商品",
+        "description": "更新商品信息",
+        "operationId": "ProductService_UpdateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productUpdateProductResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductServiceUpdateProductBody"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/api/v1/products/search": {
+      "get": {
+        "summary": "搜索商品",
+        "description": "根据关键词搜索商品",
+        "operationId": "ProductService_SearchProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productSearchProductsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "brand_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "price_min",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "price_max",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/api/v1/products/{product_id}/skus": {
+      "get": {
+        "summary": "获取商品SKU列表",
+        "description": "获取指定商品的所有SKU",
+        "operationId": "ProductService_ListProductSKUs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productListProductSKUsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "post": {
+        "summary": "创建商品SKU",
+        "description": "为商品创建新的SKU",
+        "operationId": "ProductService_CreateProductSKU",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productCreateProductSKUResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductServiceCreateProductSKUBody"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/api/v1/products/{product_id}/skus/{id}": {
+      "delete": {
+        "summary": "删除商品SKU",
+        "description": "删除商品SKU",
+        "operationId": "ProductService_DeleteProductSKU",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productDeleteProductSKUResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "put": {
+        "summary": "更新商品SKU",
+        "description": "更新商品SKU信息",
+        "operationId": "ProductService_UpdateProductSKU",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productUpdateProductSKUResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductServiceUpdateProductSKUBody"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BrandServiceUpdateBrandBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "website_url": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "is_active": {
+          "type": "boolean"
+        }
+      },
+      "title": "更新品牌请求"
+    },
+    "CategoryServiceUpdateCategoryBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "icon_url": {
+          "type": "string"
+        },
+        "banner_url": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        }
+      },
+      "title": "更新分类请求"
+    },
+    "ProductServiceCreateProductSKUBody": {
+      "type": "object",
+      "properties": {
+        "sku_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "original_price": {
+          "type": "string"
+        },
+        "sale_price": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "创建商品SKU请求"
+    },
+    "ProductServiceUpdateProductBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string"
+        },
+        "category_id": {
+          "type": "string"
+        },
+        "brand_id": {
+          "type": "string"
+        },
+        "main_image_url": {
+          "type": "string"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "original_price": {
+          "type": "string"
+        },
+        "sale_price": {
+          "type": "string"
+        },
+        "market_price": {
+          "type": "string"
+        },
+        "cost_price": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specifications": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "video_url": {
+          "type": "string"
+        },
+        "is_virtual": {
+          "type": "boolean"
+        },
+        "is_featured": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/definitions/productProductStatus"
+        },
+        "seo_title": {
+          "type": "string"
+        },
+        "seo_description": {
+          "type": "string"
+        },
+        "seo_keywords": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "更新商品请求"
+    },
+    "ProductServiceUpdateProductSKUBody": {
+      "type": "object",
+      "properties": {
+        "sku_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "original_price": {
+          "type": "string"
+        },
+        "sale_price": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "更新商品SKU请求"
+    },
+    "brandBrand": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "website_url": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "品牌信息"
+    },
+    "brandCreateBrandReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "website_url": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "创建品牌请求"
+    },
+    "brandCreateBrandResp": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "$ref": "#/definitions/brandBrand"
+        }
+      },
+      "title": "创建品牌响应"
+    },
+    "brandDeleteBrandResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "删除品牌响应"
+    },
+    "brandGetBrandResp": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "$ref": "#/definitions/brandBrand"
+        }
+      },
+      "title": "获取品牌详情响应"
+    },
+    "brandListBrandsResp": {
+      "type": "object",
+      "properties": {
+        "brands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/brandBrand"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "获取品牌列表响应"
+    },
+    "brandUpdateBrandResp": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "$ref": "#/definitions/brandBrand"
+        }
+      },
+      "title": "更新品牌响应"
+    },
+    "categoryCategory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "level": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "icon_url": {
+          "type": "string"
+        },
+        "banner_url": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/categoryCategory"
+          }
+        }
+      },
+      "title": "分类信息"
+    },
+    "categoryCreateCategoryReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "icon_url": {
+          "type": "string"
+        },
+        "banner_url": {
+          "type": "string"
+        }
+      },
+      "title": "创建分类请求"
+    },
+    "categoryCreateCategoryResp": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/categoryCategory"
+        }
+      },
+      "title": "创建分类响应"
+    },
+    "categoryDeleteCategoryResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "删除分类响应"
+    },
+    "categoryGetCategoryResp": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/categoryCategory"
+        }
+      },
+      "title": "获取分类详情响应"
+    },
+    "categoryGetCategoryTreeResp": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/categoryCategory"
+          }
+        }
+      },
+      "title": "获取分类树响应"
+    },
+    "categoryListCategoriesResp": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/categoryCategory"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "获取分类列表响应"
+    },
+    "categoryUpdateCategoryResp": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/categoryCategory"
+        }
+      },
+      "title": "更新分类响应"
+    },
+    "productCreateProductReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string"
+        },
+        "category_id": {
+          "type": "string"
+        },
+        "brand_id": {
+          "type": "string"
+        },
+        "main_image_url": {
+          "type": "string"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "original_price": {
+          "type": "string"
+        },
+        "sale_price": {
+          "type": "string"
+        },
+        "market_price": {
+          "type": "string"
+        },
+        "cost_price": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specifications": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "video_url": {
+          "type": "string"
+        },
+        "is_virtual": {
+          "type": "boolean"
+        },
+        "is_featured": {
+          "type": "boolean"
+        },
+        "seo_title": {
+          "type": "string"
+        },
+        "seo_description": {
+          "type": "string"
+        },
+        "seo_keywords": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "创建商品请求"
+    },
+    "productCreateProductResp": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/productProduct"
+        }
+      },
+      "title": "创建商品响应"
+    },
+    "productCreateProductSKUResp": {
+      "type": "object",
+      "properties": {
+        "sku": {
+          "$ref": "#/definitions/productProductSKU"
+        }
+      },
+      "title": "创建商品SKU响应"
+    },
+    "productDeleteProductResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "删除商品响应"
+    },
+    "productDeleteProductSKUResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "删除商品SKU响应"
+    },
+    "productGetProductResp": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/productProduct"
+        }
+      },
+      "title": "获取商品详情响应"
+    },
+    "productListProductSKUsResp": {
+      "type": "object",
+      "properties": {
+        "skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/productProductSKU"
+          }
+        }
+      },
+      "title": "获取商品SKU列表响应"
+    },
+    "productListProductsResp": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/productProduct"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "获取商品列表响应"
+    },
+    "productProduct": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string"
+        },
+        "category_id": {
+          "type": "string"
+        },
+        "brand_id": {
+          "type": "string"
+        },
+        "main_image_url": {
+          "type": "string"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "original_price": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "sale_price": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "market_price": {
+          "type": "string",
+          "title": "市场价"
+        },
+        "cost_price": {
+          "type": "string",
+          "title": "成本价"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "标签"
+        },
+        "specifications": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "规格参数"
+        },
+        "video_url": {
+          "type": "string",
+          "title": "视频URL"
+        },
+        "is_virtual": {
+          "type": "boolean",
+          "title": "是否虚拟商品"
+        },
+        "is_featured": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/definitions/productProductStatus"
+        },
+        "seo_title": {
+          "type": "string"
+        },
+        "seo_description": {
+          "type": "string"
+        },
+        "seo_keywords": {
+          "type": "string"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/productProductSKU"
+          }
+        },
+        "category_name": {
+          "type": "string",
+          "title": "冗余字段，用于列表显示"
+        },
+        "brand_name": {
+          "type": "string",
+          "title": "冗余字段，用于列表显示"
+        }
+      },
+      "title": "商品信息"
+    },
+    "productProductSKU": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "sku_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "original_price": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "sale_price": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "market_price": {
+          "type": "string",
+          "title": "市场价"
+        },
+        "cost_price": {
+          "type": "string",
+          "title": "成本价"
+        },
+        "stock_quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "sort_order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "属性键值对，如 color: red, size: L"
+        }
+      },
+      "title": "商品SKU信息"
+    },
+    "productProductStatus": {
+      "type": "integer",
+      "format": "int32",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "default": 0,
+      "description": "- 1: 草稿\n - 2: 上架\n - 3: 下架\n - 4: 已删除",
+      "title": "商品状态枚举"
+    },
+    "productSearchProductsResp": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/productProduct"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "搜索商品响应"
+    },
+    "productUpdateProductResp": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/productProduct"
+        }
+      },
+      "title": "更新商品响应"
+    },
+    "productUpdateProductSKUResp": {
+      "type": "object",
+      "properties": {
+        "sku": {
+          "$ref": "#/definitions/productProductSKU"
+        }
+      },
+      "title": "更新商品SKU响应"
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "description": "Bearer token",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

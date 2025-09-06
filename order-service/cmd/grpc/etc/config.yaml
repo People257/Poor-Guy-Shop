@@ -1,0 +1,52 @@
+server:
+  grpc:
+    port: 9002
+  http:
+    port: 9003
+
+log:
+  level: "info"
+  format: "json"
+  output: "stdout"
+
+database:
+  master:
+    host: "47.99.147.94"
+    port: 5432
+    user: "postgres"
+    password: "wdh961100"
+    database: "order-service"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+  pool_size: 10
+
+registry:
+  type: "consul"
+  address: "localhost:8500"
+  service_name: "order-service"
+
+observability:
+  metrics:
+    enabled: true
+    port: 9004
+  tracing:
+    enabled: true
+    endpoint: "http://localhost:14268/api/traces"
+    service_name: "order-service"
+
+services:
+  user_service:
+    host: "localhost"
+    port: 9000
+  product_service:
+    host: "localhost"
+    port: 9001
+  payment_service:
+    host: "localhost"
+    port: 9004
+  inventory_service:
+    host: "localhost"
+    port: 9003

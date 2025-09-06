@@ -1,0 +1,241 @@
+syntax = "proto3";
+
+package inventory.inventory;
+
+option go_package = "github.com/people257/poor-guy-shop/inventory-service/gen/proto/inventory/inventory";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// 库存服务
+service InventoryService {
+  // 查询库存
+  rpc GetInventory(GetInventoryReq) returns (GetInventoryResp) {
+    option (google.api.http) = {
+      get: "/api/v1/inventory/{sku_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "查询库存";
+      description: "根据SKU ID查询库存信息";
+    };
+  }
+
+  // 批量查询库存
+  rpc BatchGetInventory(BatchGetInventoryReq) returns (BatchGetInventoryResp) {
+    option (google.api.http) = {
+      post: "/api/v1/inventory/batch"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "批量查询库存";
+      description: "批量查询多个SKU的库存信息";
+    };
+  }
+
+  // 更新库存
+  rpc UpdateInventory(UpdateInventoryReq) returns (UpdateInventoryResp) {
+    option (google.api.http) = {
+      put: "/api/v1/inventory/{sku_id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "更新库存";
+      description: "更新SKU的库存数量";
+    };
+  }
+
+  // 预占库存
+  rpc ReserveInventory(ReserveInventoryReq) returns (ReserveInventoryResp) {
+    option (google.api.http) = {
+      post: "/api/v1/inventory/reserve"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "预占库存";
+      description: "为订单预占库存，防止超卖";
+    };
+  }
+
+  // 释放预占库存
+  rpc ReleaseReservedInventory(ReleaseReservedInventoryReq) returns (ReleaseReservedInventoryResp) {
+    option (google.api.http) = {
+      post: "/api/v1/inventory/release"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "释放预占库存";
+      description: "释放订单的预占库存";
+    };
+  }
+
+  // 确认扣减库存
+  rpc ConfirmInventoryDeduction(ConfirmInventoryDeductionReq) returns (ConfirmInventoryDeductionResp) {
+    option (google.api.http) = {
+      post: "/api/v1/inventory/confirm"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "确认扣减库存";
+      description: "确认扣减预占的库存";
+    };
+  }
+
+  // 库存变动日志
+  rpc GetInventoryLogs(GetInventoryLogsReq) returns (GetInventoryLogsResp) {
+    option (google.api.http) = {
+      get: "/api/v1/inventory/{sku_id}/logs"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "库存变动日志";
+      description: "查询SKU的库存变动历史";
+    };
+  }
+
+  // 内部RPC - 检查库存充足性
+  rpc CheckInventoryAvailability(CheckInventoryAvailabilityReq) returns (CheckInventoryAvailabilityResp);
+}
+
+// 库存变动类型枚举
+enum InventoryChangeType {
+  INVENTORY_CHANGE_TYPE_UNSPECIFIED = 0;
+  INVENTORY_CHANGE_TYPE_IN = 1;         // 入库
+  INVENTORY_CHANGE_TYPE_OUT = 2;        // 出库
+  INVENTORY_CHANGE_TYPE_RESERVE = 3;    // 预占
+  INVENTORY_CHANGE_TYPE_RELEASE = 4;    // 释放预占
+  INVENTORY_CHANGE_TYPE_ADJUST = 5;     // 库存调整
+}
+
+// 库存信息
+message Inventory {
+  string sku_id = 1;                    // SKU ID
+  int32 available_quantity = 2;         // 可用库存
+  int32 reserved_quantity = 3;          // 预占库存
+  int32 total_quantity = 4;             // 总库存
+  int32 alert_quantity = 5;             // 告警库存
+  google.protobuf.Timestamp updated_at = 6; // 更新时间
+}
+
+// 库存变动日志
+message InventoryLog {
+  string id = 1;                        // 日志ID
+  string sku_id = 2;                    // SKU ID
+  InventoryChangeType type = 3;         // 变动类型
+  int32 quantity = 4;                   // 变动数量
+  int32 before_quantity = 5;            // 变动前数量
+  int32 after_quantity = 6;             // 变动后数量
+  string reason = 7;                    // 变动原因
+  string order_id = 8;                  // 关联订单ID
+  google.protobuf.Timestamp created_at = 9; // 创建时间
+}
+
+// 库存预占记录
+message InventoryReservation {
+  string id = 1;                        // 预占ID
+  string sku_id = 2;                    // SKU ID
+  string order_id = 3;                  // 订单ID
+  int32 quantity = 4;                   // 预占数量
+  string status = 5;                    // 状态：reserved/confirmed/released
+  google.protobuf.Timestamp created_at = 6;  // 创建时间
+  google.protobuf.Timestamp expires_at = 7;  // 过期时间
+}
+
+// 查询库存请求
+message GetInventoryReq {
+  string sku_id = 1;                    // SKU ID
+}
+
+// 查询库存响应
+message GetInventoryResp {
+  Inventory inventory = 1;              // 库存信息
+}
+
+// 批量查询库存请求
+message BatchGetInventoryReq {
+  repeated string sku_ids = 1;          // SKU ID列表
+}
+
+// 批量查询库存响应
+message BatchGetInventoryResp {
+  repeated Inventory inventories = 1;   // 库存信息列表
+}
+
+// 更新库存请求
+message UpdateInventoryReq {
+  string sku_id = 1;                    // SKU ID
+  int32 quantity = 2;                   // 库存数量
+  InventoryChangeType type = 3;         // 变动类型
+  string reason = 4;                    // 变动原因
+}
+
+// 更新库存响应
+message UpdateInventoryResp {
+  Inventory inventory = 1;              // 更新后的库存信息
+}
+
+// 预占库存请求
+message ReserveInventoryReq {
+  string order_id = 1;                  // 订单ID
+  repeated ReserveItem items = 2;       // 预占商品列表
+}
+
+// 预占商品项
+message ReserveItem {
+  string sku_id = 1;                    // SKU ID
+  int32 quantity = 2;                   // 预占数量
+}
+
+// 预占库存响应
+message ReserveInventoryResp {
+  bool success = 1;                     // 预占结果
+  string message = 2;                   // 错误信息
+  repeated InventoryReservation reservations = 3; // 预占记录
+}
+
+// 释放预占库存请求
+message ReleaseReservedInventoryReq {
+  string order_id = 1;                  // 订单ID
+}
+
+// 释放预占库存响应
+message ReleaseReservedInventoryResp {
+  bool success = 1;                     // 释放结果
+  string message = 2;                   // 消息
+}
+
+// 确认扣减库存请求
+message ConfirmInventoryDeductionReq {
+  string order_id = 1;                  // 订单ID
+}
+
+// 确认扣减库存响应
+message ConfirmInventoryDeductionResp {
+  bool success = 1;                     // 确认结果
+  string message = 2;                   // 消息
+}
+
+// 查询库存日志请求
+message GetInventoryLogsReq {
+  string sku_id = 1;                    // SKU ID
+  int32 page = 2;                       // 页码
+  int32 page_size = 3;                  // 每页数量
+}
+
+// 查询库存日志响应
+message GetInventoryLogsResp {
+  repeated InventoryLog logs = 1;       // 日志列表
+  int64 total = 2;                      // 总数量
+  int32 page = 3;                       // 当前页
+  int32 page_size = 4;                  // 每页数量
+}
+
+// 检查库存充足性请求（内部RPC）
+message CheckInventoryAvailabilityReq {
+  repeated ReserveItem items = 1;       // 检查的商品列表
+}
+
+// 检查库存充足性响应（内部RPC）
+message CheckInventoryAvailabilityResp {
+  bool available = 1;                   // 库存是否充足
+  repeated string insufficient_skus = 2; // 库存不足的SKU列表
+}

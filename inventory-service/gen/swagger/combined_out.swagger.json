@@ -1,0 +1,513 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/inventory/payment/payment.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PaymentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/payments": {
+      "post": {
+        "summary": "创建支付订单",
+        "description": "创建支付订单并返回支付参数",
+        "operationId": "PaymentService_CreatePaymentOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentCreatePaymentOrderResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/paymentCreatePaymentOrderReq"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/payments/callback/{provider}": {
+      "post": {
+        "summary": "支付回调处理",
+        "description": "处理第三方支付平台的回调通知",
+        "operationId": "PaymentService_HandlePaymentCallback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentHandlePaymentCallbackResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "provider",
+            "description": "支付提供商 (alipay/wechat)",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PaymentServiceHandlePaymentCallbackBody"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/payments/{paymentId}": {
+      "get": {
+        "summary": "查询支付订单",
+        "description": "根据支付订单ID查询支付状态",
+        "operationId": "PaymentService_GetPaymentOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentGetPaymentOrderResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "paymentId",
+            "description": "支付订单ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/payments/{paymentId}/refunds": {
+      "post": {
+        "summary": "申请退款",
+        "description": "对已支付的订单申请退款",
+        "operationId": "PaymentService_CreateRefund",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentCreateRefundResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "paymentId",
+            "description": "支付订单ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PaymentServiceCreateRefundBody"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/refunds/{refundId}": {
+      "get": {
+        "summary": "查询退款状态",
+        "description": "根据退款ID查询退款状态",
+        "operationId": "PaymentService_GetRefund",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentGetRefundResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "refundId",
+            "description": "退款ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PaymentServiceCreateRefundBody": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "title": "退款金额"
+        },
+        "reason": {
+          "type": "string",
+          "title": "退款原因"
+        }
+      },
+      "title": "创建退款请求"
+    },
+    "PaymentServiceHandlePaymentCallbackBody": {
+      "type": "object",
+      "properties": {
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "回调参数"
+        }
+      },
+      "title": "支付回调处理请求"
+    },
+    "paymentCreatePaymentOrderReq": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "title": "业务订单ID"
+        },
+        "amount": {
+          "type": "string",
+          "title": "支付金额"
+        },
+        "paymentMethod": {
+          "$ref": "#/definitions/paymentPaymentMethod",
+          "title": "支付方式"
+        },
+        "subject": {
+          "type": "string",
+          "title": "支付主题"
+        },
+        "description": {
+          "type": "string",
+          "title": "支付描述"
+        },
+        "notifyUrl": {
+          "type": "string",
+          "title": "回调地址"
+        },
+        "returnUrl": {
+          "type": "string",
+          "title": "返回地址"
+        }
+      },
+      "title": "创建支付订单请求"
+    },
+    "paymentCreatePaymentOrderResp": {
+      "type": "object",
+      "properties": {
+        "paymentOrder": {
+          "$ref": "#/definitions/paymentPaymentOrder",
+          "title": "支付订单信息"
+        },
+        "paymentUrl": {
+          "type": "string",
+          "title": "支付链接（网页支付）"
+        },
+        "qrCode": {
+          "type": "string",
+          "title": "二维码（扫码支付）"
+        },
+        "paymentParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "支付参数（SDK支付）"
+        }
+      },
+      "title": "创建支付订单响应"
+    },
+    "paymentCreateRefundResp": {
+      "type": "object",
+      "properties": {
+        "refund": {
+          "$ref": "#/definitions/paymentRefund",
+          "title": "退款信息"
+        }
+      },
+      "title": "创建退款响应"
+    },
+    "paymentGetPaymentOrderResp": {
+      "type": "object",
+      "properties": {
+        "paymentOrder": {
+          "$ref": "#/definitions/paymentPaymentOrder",
+          "title": "支付订单信息"
+        }
+      },
+      "title": "查询支付订单响应"
+    },
+    "paymentGetRefundResp": {
+      "type": "object",
+      "properties": {
+        "refund": {
+          "$ref": "#/definitions/paymentRefund",
+          "title": "退款信息"
+        }
+      },
+      "title": "查询退款响应"
+    },
+    "paymentHandlePaymentCallbackResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "title": "处理结果"
+        },
+        "message": {
+          "type": "string",
+          "title": "响应消息"
+        }
+      },
+      "title": "支付回调处理响应"
+    },
+    "paymentPaymentMethod": {
+      "type": "string",
+      "enum": [
+        "PAYMENT_METHOD_UNSPECIFIED",
+        "PAYMENT_METHOD_ALIPAY",
+        "PAYMENT_METHOD_WECHAT",
+        "PAYMENT_METHOD_BANK_CARD",
+        "PAYMENT_METHOD_BALANCE"
+      ],
+      "default": "PAYMENT_METHOD_UNSPECIFIED",
+      "description": "- PAYMENT_METHOD_ALIPAY: 支付宝\n - PAYMENT_METHOD_WECHAT: 微信支付\n - PAYMENT_METHOD_BANK_CARD: 银行卡\n - PAYMENT_METHOD_BALANCE: 余额支付",
+      "title": "支付方式枚举"
+    },
+    "paymentPaymentOrder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "支付订单ID"
+        },
+        "orderId": {
+          "type": "string",
+          "title": "业务订单ID"
+        },
+        "userId": {
+          "type": "string",
+          "title": "用户ID"
+        },
+        "amount": {
+          "type": "string",
+          "title": "支付金额"
+        },
+        "paymentMethod": {
+          "$ref": "#/definitions/paymentPaymentMethod",
+          "title": "支付方式"
+        },
+        "status": {
+          "$ref": "#/definitions/paymentPaymentStatus",
+          "title": "支付状态"
+        },
+        "thirdPartyOrderId": {
+          "type": "string",
+          "title": "第三方支付订单ID"
+        },
+        "thirdPartyResponse": {
+          "type": "string",
+          "title": "第三方支付响应"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "创建时间"
+        },
+        "paidAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "支付时间"
+        },
+        "expiredAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "过期时间"
+        }
+      },
+      "title": "支付订单信息"
+    },
+    "paymentPaymentStatus": {
+      "type": "string",
+      "enum": [
+        "PAYMENT_STATUS_UNSPECIFIED",
+        "PAYMENT_STATUS_PENDING",
+        "PAYMENT_STATUS_SUCCESS",
+        "PAYMENT_STATUS_FAILED",
+        "PAYMENT_STATUS_CANCELLED",
+        "PAYMENT_STATUS_REFUNDED",
+        "PAYMENT_STATUS_PARTIAL_REFUNDED"
+      ],
+      "default": "PAYMENT_STATUS_UNSPECIFIED",
+      "description": "- PAYMENT_STATUS_PENDING: 待支付\n - PAYMENT_STATUS_SUCCESS: 支付成功\n - PAYMENT_STATUS_FAILED: 支付失败\n - PAYMENT_STATUS_CANCELLED: 已取消\n - PAYMENT_STATUS_REFUNDED: 已退款\n - PAYMENT_STATUS_PARTIAL_REFUNDED: 部分退款",
+      "title": "支付状态枚举"
+    },
+    "paymentRefund": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "退款ID"
+        },
+        "paymentOrderId": {
+          "type": "string",
+          "title": "支付订单ID"
+        },
+        "amount": {
+          "type": "string",
+          "title": "退款金额"
+        },
+        "reason": {
+          "type": "string",
+          "title": "退款原因"
+        },
+        "status": {
+          "$ref": "#/definitions/paymentRefundStatus",
+          "title": "退款状态"
+        },
+        "thirdPartyRefundId": {
+          "type": "string",
+          "title": "第三方退款ID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "创建时间"
+        },
+        "processedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "处理时间"
+        }
+      },
+      "title": "退款信息"
+    },
+    "paymentRefundStatus": {
+      "type": "string",
+      "enum": [
+        "REFUND_STATUS_UNSPECIFIED",
+        "REFUND_STATUS_PENDING",
+        "REFUND_STATUS_SUCCESS",
+        "REFUND_STATUS_FAILED"
+      ],
+      "default": "REFUND_STATUS_UNSPECIFIED",
+      "description": "- REFUND_STATUS_PENDING: 退款处理中\n - REFUND_STATUS_SUCCESS: 退款成功\n - REFUND_STATUS_FAILED: 退款失败",
+      "title": "退款状态枚举"
+    },
+    "paymentVerifyPaymentStatusResp": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/paymentPaymentStatus",
+          "title": "支付状态"
+        },
+        "paymentId": {
+          "type": "string",
+          "title": "支付订单ID"
+        },
+        "amount": {
+          "type": "string",
+          "title": "支付金额"
+        }
+      },
+      "title": "验证支付状态响应（内部RPC）"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

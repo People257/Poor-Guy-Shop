@@ -1,0 +1,5 @@
+host: "47.99.147.94"
+port: 5432
+database: "inventory-service"
+user: "postgres"
+password: "wdh961100"

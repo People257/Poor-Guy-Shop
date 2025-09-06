@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+package order.cart;
+
+option go_package = "github.com/people257/poor-guy-shop/order-service/gen/proto/order/cart";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// 购物车服务
+service CartService {
+  // 添加商品到购物车
+  rpc AddCartItem(AddCartItemReq) returns (AddCartItemResp) {
+    option (google.api.http) = {
+      post: "/api/v1/cart/items"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "添加商品到购物车";
+      description: "将商品添加到用户购物车";
+    };
+  }
+
+  // 更新购物车商品
+  rpc UpdateCartItem(UpdateCartItemReq) returns (UpdateCartItemResp) {
+    option (google.api.http) = {
+      put: "/api/v1/cart/items/{item_id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "更新购物车商品";
+      description: "更新购物车中商品的数量";
+    };
+  }
+
+  // 删除购物车商品
+  rpc RemoveCartItem(RemoveCartItemReq) returns (RemoveCartItemResp) {
+    option (google.api.http) = {
+      delete: "/api/v1/cart/items/{item_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "删除购物车商品";
+      description: "从购物车中删除指定商品";
+    };
+  }
+
+  // 获取购物车列表
+  rpc GetCart(GetCartReq) returns (GetCartResp) {
+    option (google.api.http) = {
+      get: "/api/v1/cart"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "获取购物车";
+      description: "获取用户购物车中的所有商品";
+    };
+  }
+
+  // 清空购物车
+  rpc ClearCart(ClearCartReq) returns (ClearCartResp) {
+    option (google.api.http) = {
+      delete: "/api/v1/cart"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "清空购物车";
+      description: "清空用户购物车中的所有商品";
+    };
+  }
+
+  // 选择/取消选择购物车商品
+  rpc SelectCartItems(SelectCartItemsReq) returns (SelectCartItemsResp) {
+    option (google.api.http) = {
+      post: "/api/v1/cart/select"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "选择购物车商品";
+      description: "选择或取消选择购物车中的商品";
+    };
+  }
+}
+
+// 购物车商品信息
+message CartItem {
+  string id = 1;
+  string user_id = 2;
+  string product_id = 3;
+  string sku_id = 4;
+  string product_name = 5;      // 冗余字段，从product-service获取
+  string product_image = 6;     // 商品主图
+  string sku_name = 7;          // SKU名称
+  string price = 8;             // 当前价格
+  int32 quantity = 9;
+  string total_amount = 10;     // 小计金额
+  bool selected = 11;           // 是否选中
+  bool available = 12;          // 商品是否可用（库存充足等）
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+// 购物车汇总信息
+message CartSummary {
+  int32 total_items = 1;        // 总商品数量
+  int32 selected_items = 2;     // 已选择商品数量
+  string total_amount = 3;      // 总金额
+  string selected_amount = 4;   // 已选择商品金额
+}
+
+// 添加商品到购物车请求
+message AddCartItemReq {
+  string user_id = 1;
+  string product_id = 2;
+  string sku_id = 3;
+  int32 quantity = 4;
+}
+
+// 添加商品到购物车响应
+message AddCartItemResp {
+  CartItem item = 1;
+}
+
+// 更新购物车商品请求
+message UpdateCartItemReq {
+  string user_id = 1;
+  string item_id = 2;
+  int32 quantity = 3;
+}
+
+// 更新购物车商品响应
+message UpdateCartItemResp {
+  CartItem item = 1;
+}
+
+// 删除购物车商品请求
+message RemoveCartItemReq {
+  string user_id = 1;
+  string item_id = 2;
+}
+
+// 删除购物车商品响应
+message RemoveCartItemResp {
+  bool success = 1;
+}
+
+// 获取购物车请求
+message GetCartReq {
+  string user_id = 1;
+}
+
+// 获取购物车响应
+message GetCartResp {
+  repeated CartItem items = 1;
+  CartSummary summary = 2;
+}
+
+// 清空购物车请求
+message ClearCartReq {
+  string user_id = 1;
+}
+
+// 清空购物车响应
+message ClearCartResp {
+  bool success = 1;
+}
+
+// 选择购物车商品请求
+message SelectCartItemsReq {
+  string user_id = 1;
+  repeated string item_ids = 2;
+  bool selected = 3;            // true选择，false取消选择
+}
+
+// 选择购物车商品响应
+message SelectCartItemsResp {
+  bool success = 1;
+  CartSummary summary = 2;
+}

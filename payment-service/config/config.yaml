@@ -1,0 +1,41 @@
+grpc_server_config:
+  host: "0.0.0.0"
+  port: 9003
+
+database:
+  host: 47.99.147.94
+  port: 5432
+  username: postgres
+  password: wdh961100
+  database: payment-service
+  sslmode: disable
+  timezone: Asia/Shanghai
+
+redis:
+  addr: localhost:6379
+  password: ""
+  db: 0
+
+# 支付配置
+payment:
+  # 支付宝配置
+  alipay:
+    app_id: "your_alipay_app_id"
+    private_key: "your_alipay_private_key"
+    public_key: "alipay_public_key"
+    is_sandbox: true
+    
+  # 微信支付配置
+  wechat:
+    app_id: "your_wechat_app_id"
+    mch_id: "your_wechat_mch_id"
+    api_key: "your_wechat_api_key"
+    cert_path: "path/to/cert.pem"
+    key_path: "path/to/key.pem"
+    is_sandbox: true
+
+# 服务依赖配置
+services:
+  order_service:
+    host: localhost
+    port: 9002

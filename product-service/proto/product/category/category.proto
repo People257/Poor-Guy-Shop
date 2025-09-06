@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package product.category;
+
+option go_package = "github.com/people257/poor-guy-shop/product-service/gen/proto/product/category";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// 分类服务
+service CategoryService {
+  // 创建分类
+  rpc CreateCategory(CreateCategoryReq) returns (CreateCategoryResp) {
+    option (google.api.http) = {
+      post: "/api/v1/categories"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "创建分类";
+      description: "创建新的商品分类";
+    };
+  }
+
+  // 更新分类
+  rpc UpdateCategory(UpdateCategoryReq) returns (UpdateCategoryResp) {
+    option (google.api.http) = {
+      put: "/api/v1/categories/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "更新分类";
+      description: "更新商品分类信息";
+    };
+  }
+
+  // 删除分类
+  rpc DeleteCategory(DeleteCategoryReq) returns (DeleteCategoryResp) {
+    option (google.api.http) = {
+      delete: "/api/v1/categories/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "删除分类";
+      description: "删除商品分类";
+    };
+  }
+
+  // 获取分类详情
+  rpc GetCategory(GetCategoryReq) returns (GetCategoryResp) {
+    option (google.api.http) = {
+      get: "/api/v1/categories/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "获取分类详情";
+      description: "根据ID获取分类详情";
+    };
+  }
+
+  // 获取分类列表
+  rpc ListCategories(ListCategoriesReq) returns (ListCategoriesResp) {
+    option (google.api.http) = {
+      get: "/api/v1/categories"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "获取分类列表";
+      description: "获取分类列表，支持分页和筛选";
+    };
+  }
+
+  // 获取分类树
+  rpc GetCategoryTree(GetCategoryTreeReq) returns (GetCategoryTreeResp) {
+    option (google.api.http) = {
+      get: "/api/v1/categories/tree"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "获取分类树";
+      description: "获取完整的分类树结构";
+    };
+  }
+}
+
+// 分类信息
+message Category {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string parent_id = 5;
+  int32 level = 6;
+  int32 sort_order = 7;
+  string icon_url = 8;
+  string banner_url = 9;
+  bool is_active = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  repeated Category children = 13;
+}
+
+// 创建分类请求
+message CreateCategoryReq {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  string parent_id = 4;
+  int32 sort_order = 5;
+  string icon_url = 6;
+  string banner_url = 7;
+}
+
+// 创建分类响应
+message CreateCategoryResp {
+  Category category = 1;
+}
+
+// 更新分类请求
+message UpdateCategoryReq {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string parent_id = 5;
+  int32 sort_order = 6;
+  string icon_url = 7;
+  string banner_url = 8;
+  bool is_active = 9;
+}
+
+// 更新分类响应
+message UpdateCategoryResp {
+  Category category = 1;
+}
+
+// 删除分类请求
+message DeleteCategoryReq {
+  string id = 1;
+}
+
+// 删除分类响应
+message DeleteCategoryResp {
+  bool success = 1;
+}
+
+// 获取分类详情请求
+message GetCategoryReq {
+  string id = 1;
+}
+
+// 获取分类详情响应
+message GetCategoryResp {
+  Category category = 1;
+}
+
+// 获取分类列表请求
+message ListCategoriesReq {
+  int32 page = 1;
+  int32 page_size = 2;
+  string parent_id = 3;
+  int32 level = 4;
+  bool is_active = 5;
+  string keyword = 6;
+  string sort_by = 7;
+  string sort_order = 8;
+}
+
+// 获取分类列表响应
+message ListCategoriesResp {
+  repeated Category categories = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// 获取分类树请求
+message GetCategoryTreeReq {
+  bool active_only = 1;
+}
+
+// 获取分类树响应
+message GetCategoryTreeResp {
+  repeated Category categories = 1;
+}

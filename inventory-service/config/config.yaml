@@ -1,0 +1,39 @@
+grpc_server_config:
+  host: "0.0.0.0"
+  port: 9004
+
+database:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: password
+  database: poor_guy_shop_inventory
+  sslmode: disable
+  timezone: Asia/Shanghai
+
+redis:
+  addr: localhost:6379
+  password: ""
+  db: 1
+
+# 库存配置
+inventory:
+  # 预占过期时间（分钟）
+  reservation_expire_minutes: 30
+  # 库存告警配置
+  alert:
+    enabled: true
+    low_stock_threshold: 10
+  # 分布式锁配置
+  lock:
+    prefix: "inventory_lock:"
+    expire_seconds: 30
+
+# 服务依赖配置
+services:
+  product_service:
+    host: localhost
+    port: 9000
+  order_service:
+    host: localhost
+    port: 9002

@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package payment.payment;
+
+option go_package = "github.com/people257/poor-guy-shop/payment-service/gen/proto/payment/payment";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// 支付服务
+service PaymentService {
+  // 创建支付订单
+  rpc CreatePaymentOrder(CreatePaymentOrderReq) returns (CreatePaymentOrderResp) {
+    option (google.api.http) = {
+      post: "/api/v1/payments"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "创建支付订单";
+      description: "创建支付订单并返回支付参数";
+    };
+  }
+
+  // 查询支付订单
+  rpc GetPaymentOrder(GetPaymentOrderReq) returns (GetPaymentOrderResp) {
+    option (google.api.http) = {
+      get: "/api/v1/payments/{payment_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "查询支付订单";
+      description: "根据支付订单ID查询支付状态";
+    };
+  }
+
+  // 支付回调处理
+  rpc HandlePaymentCallback(HandlePaymentCallbackReq) returns (HandlePaymentCallbackResp) {
+    option (google.api.http) = {
+      post: "/api/v1/payments/callback/{provider}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "支付回调处理";
+      description: "处理第三方支付平台的回调通知";
+    };
+  }
+
+  // 申请退款
+  rpc CreateRefund(CreateRefundReq) returns (CreateRefundResp) {
+    option (google.api.http) = {
+      post: "/api/v1/payments/{payment_id}/refunds"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "申请退款";
+      description: "对已支付的订单申请退款";
+    };
+  }
+
+  // 查询退款状态
+  rpc GetRefund(GetRefundReq) returns (GetRefundResp) {
+    option (google.api.http) = {
+      get: "/api/v1/refunds/{refund_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "查询退款状态";
+      description: "根据退款ID查询退款状态";
+    };
+  }
+
+  // 内部RPC - 验证支付状态
+  rpc VerifyPaymentStatus(VerifyPaymentStatusReq) returns (VerifyPaymentStatusResp);
+}
+
+// 支付方式枚举
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  PAYMENT_METHOD_ALIPAY = 1;      // 支付宝
+  PAYMENT_METHOD_WECHAT = 2;      // 微信支付
+  PAYMENT_METHOD_BANK_CARD = 3;   // 银行卡
+  PAYMENT_METHOD_BALANCE = 4;     // 余额支付
+}
+
+// 支付状态枚举
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_PENDING = 1;     // 待支付
+  PAYMENT_STATUS_SUCCESS = 2;     // 支付成功
+  PAYMENT_STATUS_FAILED = 3;      // 支付失败
+  PAYMENT_STATUS_CANCELLED = 4;   // 已取消
+  PAYMENT_STATUS_REFUNDED = 5;    // 已退款
+  PAYMENT_STATUS_PARTIAL_REFUNDED = 6; // 部分退款
+}
+
+// 退款状态枚举
+enum RefundStatus {
+  REFUND_STATUS_UNSPECIFIED = 0;
+  REFUND_STATUS_PENDING = 1;      // 退款处理中
+  REFUND_STATUS_SUCCESS = 2;      // 退款成功
+  REFUND_STATUS_FAILED = 3;       // 退款失败
+}
+
+// 支付订单信息
+message PaymentOrder {
+  string id = 1;                          // 支付订单ID
+  string order_id = 2;                    // 业务订单ID
+  string user_id = 3;                     // 用户ID
+  string amount = 4;                      // 支付金额
+  PaymentMethod payment_method = 5;       // 支付方式
+  PaymentStatus status = 6;               // 支付状态
+  string third_party_order_id = 7;        // 第三方支付订单ID
+  string third_party_response = 8;        // 第三方支付响应
+  google.protobuf.Timestamp created_at = 9;   // 创建时间
+  google.protobuf.Timestamp paid_at = 10;     // 支付时间
+  google.protobuf.Timestamp expired_at = 11;  // 过期时间
+}
+
+// 退款信息
+message Refund {
+  string id = 1;                          // 退款ID
+  string payment_order_id = 2;            // 支付订单ID
+  string amount = 3;                      // 退款金额
+  string reason = 4;                      // 退款原因
+  RefundStatus status = 5;                // 退款状态
+  string third_party_refund_id = 6;       // 第三方退款ID
+  google.protobuf.Timestamp created_at = 7;   // 创建时间
+  google.protobuf.Timestamp processed_at = 8; // 处理时间
+}
+
+// 创建支付订单请求
+message CreatePaymentOrderReq {
+  string order_id = 1;                    // 业务订单ID
+  string amount = 2;                      // 支付金额
+  PaymentMethod payment_method = 3;       // 支付方式
+  string subject = 4;                     // 支付主题
+  string description = 5;                 // 支付描述
+  string notify_url = 6;                  // 回调地址
+  string return_url = 7;                  // 返回地址
+}
+
+// 创建支付订单响应
+message CreatePaymentOrderResp {
+  PaymentOrder payment_order = 1;         // 支付订单信息
+  string payment_url = 2;                 // 支付链接（网页支付）
+  string qr_code = 3;                     // 二维码（扫码支付）
+  map<string, string> payment_params = 4; // 支付参数（SDK支付）
+}
+
+// 查询支付订单请求
+message GetPaymentOrderReq {
+  string payment_id = 1;                  // 支付订单ID
+}
+
+// 查询支付订单响应
+message GetPaymentOrderResp {
+  PaymentOrder payment_order = 1;         // 支付订单信息
+}
+
+// 支付回调处理请求
+message HandlePaymentCallbackReq {
+  string provider = 1;                    // 支付提供商 (alipay/wechat)
+  map<string, string> params = 2;         // 回调参数
+}
+
+// 支付回调处理响应
+message HandlePaymentCallbackResp {
+  bool success = 1;                       // 处理结果
+  string message = 2;                     // 响应消息
+}
+
+// 创建退款请求
+message CreateRefundReq {
+  string payment_id = 1;                  // 支付订单ID
+  string amount = 2;                      // 退款金额
+  string reason = 3;                      // 退款原因
+}
+
+// 创建退款响应
+message CreateRefundResp {
+  Refund refund = 1;                      // 退款信息
+}
+
+// 查询退款请求
+message GetRefundReq {
+  string refund_id = 1;                   // 退款ID
+}
+
+// 查询退款响应
+message GetRefundResp {
+  Refund refund = 1;                      // 退款信息
+}
+
+// 验证支付状态请求（内部RPC）
+message VerifyPaymentStatusReq {
+  string order_id = 1;                    // 业务订单ID
+}
+
+// 验证支付状态响应（内部RPC）
+message VerifyPaymentStatusResp {
+  PaymentStatus status = 1;               // 支付状态
+  string payment_id = 2;                  // 支付订单ID
+  string amount = 3;                      // 支付金额
+}

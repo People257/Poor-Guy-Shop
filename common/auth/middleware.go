@@ -2,6 +2,9 @@ package auth
 
 import (
 	"context"
+	"strconv"
+	"strings"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
 	authpb "github.com/people257/poor-guy-shop/user-service/gen/proto/user/auth"
@@ -10,11 +13,9 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"strconv"
-	"strings"
 )
 
-func BuildMetadataMiddleware(client authpb.) echo.MiddlewareFunc {
+func BuildMetadataMiddleware(client authpb.AuthServiceClient) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			token := c.Request().Header.Get("Authorization")
@@ -35,17 +36,17 @@ func BuildMetadataMiddleware(client authpb.) echo.MiddlewareFunc {
 				return next(c)
 			}
 			// 如果有新的 token，设置到响应头
-			if resp.NewToken != nil {
-				c.Response().Header().Set("New-Access-Token", resp.NewToken.AccessToken)
-				c.Response().Header().Set("New-Expires-In", strconv.FormatInt(resp.NewToken.ExpiresIn, 10))
+			if resp.AccessToken != "" {
+				c.Response().Header().Set("New-Access-Token", resp.AccessToken)
+				c.Response().Header().Set("New-Expires-In", strconv.FormatInt(resp.ExpiresIn, 10))
 			}
 			// 将 user_id 写入 HTTP header, 在请求时 Gateway 会自动将其写入 gRPC metadata
-			c.Request().Header.Set(HttpUserIDHeaderKey, resp.UserID)
+			c.Request().Header.Set(HttpUserIDHeaderKey, resp.UserId)
 
-			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), userIDCtxKey, resp.UserID)))
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), userIDCtxKey, resp.UserId)))
 
 			if span := trace.SpanFromContext(c.Request().Context()); span != nil && span.IsRecording() {
-				span.SetAttributes(semconv.UserID(resp.UserID))
+				span.SetAttributes(semconv.UserID(resp.UserId))
 			}
 
 			return next(c)

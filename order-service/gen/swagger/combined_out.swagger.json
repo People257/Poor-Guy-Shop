@@ -1,0 +1,1085 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Order Service API",
+    "description": "订单服务API文档",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Poor Guy Shop",
+      "email": "support@poorguys.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "CartService"
+    },
+    {
+      "name": "OrderService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/cart/items": {
+      "post": {
+        "summary": "添加商品到购物车",
+        "description": "将商品添加到用户购物车",
+        "operationId": "CartService_AddCartItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartAddCartItemResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cartAddCartItemReq"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/api/v1/cart/items/{item_id}": {
+      "delete": {
+        "summary": "删除购物车商品",
+        "description": "从购物车中删除指定商品",
+        "operationId": "CartService_RemoveCartItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartRemoveCartItemResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      },
+      "put": {
+        "summary": "更新购物车商品",
+        "description": "更新购物车中商品的数量",
+        "operationId": "CartService_UpdateCartItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartUpdateCartItemResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CartServiceUpdateCartItemBody"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/api/v1/cart": {
+      "get": {
+        "summary": "获取购物车",
+        "description": "获取用户购物车中的所有商品",
+        "operationId": "CartService_GetCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartGetCartResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      },
+      "delete": {
+        "summary": "清空购物车",
+        "description": "清空用户购物车中的所有商品",
+        "operationId": "CartService_ClearCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartClearCartResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/api/v1/cart/select": {
+      "post": {
+        "summary": "选择购物车商品",
+        "description": "选择或取消选择购物车中的商品",
+        "operationId": "CartService_SelectCartItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cartSelectCartItemsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cartSelectCartItemsReq"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "summary": "获取订单列表",
+        "description": "获取用户订单列表，支持分页和筛选",
+        "operationId": "OrderService_ListOrders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderListOrdersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      },
+      "post": {
+        "summary": "创建订单",
+        "description": "根据购物车商品创建新订单",
+        "operationId": "OrderService_CreateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderCreateOrderResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderCreateOrderReq"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}": {
+      "get": {
+        "summary": "获取订单详情",
+        "description": "根据订单ID获取订单详细信息",
+        "operationId": "OrderService_GetOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderGetOrderResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}/cancel": {
+      "post": {
+        "summary": "取消订单",
+        "description": "取消指定订单",
+        "operationId": "OrderService_CancelOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderCancelOrderResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderServiceCancelOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}/confirm": {
+      "post": {
+        "summary": "确认收货",
+        "description": "确认收货完成订单",
+        "operationId": "OrderService_ConfirmOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderConfirmOrderResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderServiceConfirmOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}/pay": {
+      "post": {
+        "summary": "支付订单",
+        "description": "处理订单支付",
+        "operationId": "OrderService_PayOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderPayOrderResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderServicePayOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}/status": {
+      "put": {
+        "summary": "更新订单状态",
+        "description": "更新订单状态",
+        "operationId": "OrderService_UpdateOrderStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderUpdateOrderStatusResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "description": "订单ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderServiceUpdateOrderStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CartServiceUpdateCartItemBody": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "更新购物车商品请求"
+    },
+    "OrderServiceCancelOrderBody": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "title": "取消订单请求"
+    },
+    "OrderServiceConfirmOrderBody": {
+      "type": "object",
+      "title": "确认收货请求"
+    },
+    "OrderServicePayOrderBody": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "payment_method": {
+          "type": "string"
+        }
+      },
+      "title": "支付订单请求"
+    },
+    "OrderServiceUpdateOrderStatusBody": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户ID"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "新状态"
+        },
+        "reason": {
+          "type": "string",
+          "title": "更新原因"
+        }
+      },
+      "title": "更新订单状态请求"
+    },
+    "cartAddCartItemReq": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "添加商品到购物车请求"
+    },
+    "cartAddCartItemResp": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/cartCartItem"
+        }
+      },
+      "title": "添加商品到购物车响应"
+    },
+    "cartCartItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "product_name": {
+          "type": "string",
+          "title": "冗余字段，从product-service获取"
+        },
+        "product_image": {
+          "type": "string",
+          "title": "商品主图"
+        },
+        "sku_name": {
+          "type": "string",
+          "title": "SKU名称"
+        },
+        "price": {
+          "type": "string",
+          "title": "当前价格"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_amount": {
+          "type": "string",
+          "title": "小计金额"
+        },
+        "selected": {
+          "type": "boolean",
+          "title": "是否选中"
+        },
+        "available": {
+          "type": "boolean",
+          "title": "商品是否可用（库存充足等）"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "购物车商品信息"
+    },
+    "cartCartSummary": {
+      "type": "object",
+      "properties": {
+        "total_items": {
+          "type": "integer",
+          "format": "int32",
+          "title": "总商品数量"
+        },
+        "selected_items": {
+          "type": "integer",
+          "format": "int32",
+          "title": "已选择商品数量"
+        },
+        "total_amount": {
+          "type": "string",
+          "title": "总金额"
+        },
+        "selected_amount": {
+          "type": "string",
+          "title": "已选择商品金额"
+        }
+      },
+      "title": "购物车汇总信息"
+    },
+    "cartClearCartResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "清空购物车响应"
+    },
+    "cartGetCartResp": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/cartCartItem"
+          }
+        },
+        "summary": {
+          "$ref": "#/definitions/cartCartSummary"
+        }
+      },
+      "title": "获取购物车响应"
+    },
+    "cartRemoveCartItemResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "删除购物车商品响应"
+    },
+    "cartSelectCartItemsReq": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selected": {
+          "type": "boolean",
+          "title": "true选择，false取消选择"
+        }
+      },
+      "title": "选择购物车商品请求"
+    },
+    "cartSelectCartItemsResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "summary": {
+          "$ref": "#/definitions/cartCartSummary"
+        }
+      },
+      "title": "选择购物车商品响应"
+    },
+    "cartUpdateCartItemResp": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/cartCartItem"
+        }
+      },
+      "title": "更新购物车商品响应"
+    },
+    "orderCancelOrderResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "取消订单响应"
+    },
+    "orderConfirmOrderResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "确认收货响应"
+    },
+    "orderCreateOrderReq": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "用户ID"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderOrderItemReq"
+          },
+          "title": "订单商品项"
+        },
+        "address": {
+          "$ref": "#/definitions/orderOrderAddressReq",
+          "title": "收货地址"
+        },
+        "payment_method": {
+          "type": "string",
+          "title": "支付方式"
+        },
+        "remark": {
+          "type": "string",
+          "title": "订单备注"
+        },
+        "discount_amount": {
+          "type": "string",
+          "title": "优惠金额"
+        },
+        "shipping_fee": {
+          "type": "string",
+          "title": "运费"
+        }
+      },
+      "title": "创建订单请求"
+    },
+    "orderCreateOrderResp": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/orderOrder"
+        }
+      },
+      "title": "创建订单响应"
+    },
+    "orderGetOrderResp": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/orderOrder"
+        }
+      },
+      "title": "获取订单详情响应"
+    },
+    "orderListOrdersResp": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderOrder"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_pages": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "获取订单列表响应"
+    },
+    "orderOrder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "order_no": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/orderOrderStatus"
+        },
+        "total_amount": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "discount_amount": {
+          "type": "string",
+          "title": "优惠金额"
+        },
+        "shipping_fee": {
+          "type": "string",
+          "title": "运费"
+        },
+        "actual_amount": {
+          "type": "string",
+          "title": "实付金额"
+        },
+        "payment_method": {
+          "$ref": "#/definitions/orderPaymentMethod"
+        },
+        "payment_status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "payment_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "delivery_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "receive_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancel_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancel_reason": {
+          "type": "string"
+        },
+        "remark": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderOrderItem"
+          }
+        },
+        "address": {
+          "$ref": "#/definitions/orderOrderAddress"
+        }
+      },
+      "title": "订单信息"
+    },
+    "orderOrderAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "receiver_name": {
+          "type": "string"
+        },
+        "receiver_phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        }
+      },
+      "title": "订单收货地址"
+    },
+    "orderOrderAddressReq": {
+      "type": "object",
+      "properties": {
+        "receiver_name": {
+          "type": "string",
+          "title": "收货人姓名"
+        },
+        "receiver_phone": {
+          "type": "string",
+          "title": "收货人电话"
+        },
+        "province": {
+          "type": "string",
+          "title": "省份"
+        },
+        "city": {
+          "type": "string",
+          "title": "城市"
+        },
+        "district": {
+          "type": "string",
+          "title": "区县"
+        },
+        "detail_address": {
+          "type": "string",
+          "title": "详细地址"
+        },
+        "postal_code": {
+          "type": "string",
+          "title": "邮政编码"
+        }
+      },
+      "title": "订单地址请求"
+    },
+    "orderOrderItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "product_name": {
+          "type": "string"
+        },
+        "product_image": {
+          "type": "string"
+        },
+        "sku_name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "string",
+          "title": "使用string存储decimal"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_amount": {
+          "type": "string",
+          "title": "小计金额"
+        }
+      },
+      "title": "订单商品信息"
+    },
+    "orderOrderItemReq": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "title": "商品ID"
+        },
+        "sku_id": {
+          "type": "string",
+          "title": "SKU ID"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "数量"
+        },
+        "price": {
+          "type": "string",
+          "title": "价格"
+        },
+        "product_name": {
+          "type": "string",
+          "title": "商品名称"
+        },
+        "sku_name": {
+          "type": "string",
+          "title": "SKU名称"
+        }
+      },
+      "title": "订单商品项请求"
+    },
+    "orderOrderStatus": {
+      "type": "integer",
+      "format": "int32",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "default": 0,
+      "description": "- 1: 待付款\n - 2: 已付款\n - 3: 已发货\n - 4: 已收货\n - 5: 已取消\n - 6: 已退款",
+      "title": "订单状态枚举"
+    },
+    "orderPayOrderResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "payment_no": {
+          "type": "string",
+          "title": "支付流水号"
+        },
+        "third_party_url": {
+          "type": "string",
+          "title": "第三方支付URL（如支付宝、微信）"
+        }
+      },
+      "title": "支付订单响应"
+    },
+    "orderPaymentMethod": {
+      "type": "integer",
+      "format": "int32",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "default": 0,
+      "description": "- 1: 支付宝\n - 2: 微信支付\n - 3: 余额支付",
+      "title": "支付方式枚举"
+    },
+    "orderUpdateOrderStatusResp": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "title": "更新订单状态响应"
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "description": "JWT token, format: Bearer {token}",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}
